@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
     android:gravity="top|center_vertical"
     android:clickable="true"
     android:focusable="true"
@@ -9,18 +9,35 @@
     android:orientation="vertical">
 
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
         android:id="@+id/homebuttonView"
-        android:layout_gravity="top"
-        android:layout_weight="0.27"
-        android:contentDescription="buttomImage" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitXY"
+        android:contentDescription="buttomImage"
+        android:src="@mipmap/ic_artist"
+        android:longClickable="true" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/homebuttonView"
+        android:text="Title Info"
+        android:textSize="18sp"
         android:text="New Text"
         android:id="@+id/txtLabel"
-        android:layout_gravity="center_vertical" />
+        android:paddingStart="5dp" />
 
-</LinearLayout>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="subtitle"
+        android:id="@+id/textView"
+        android:layout_toEndOf="@+id/homebuttonView"
+        android:textSize="14sp"
+        android:layout_alignBottom="@+id/homebuttonView"
+        android:paddingStart="5dp" />
+
+</RelativeLayout>
