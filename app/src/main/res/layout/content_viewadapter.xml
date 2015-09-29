@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="60dp"
         android:layout_height="match_parent"
-        android:id="@+id/homebuttonView"
+        android:id="@+id/coverImage"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -23,10 +23,9 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/homebuttonView"
+        android:layout_toRightOf="@+id/coverImage"
         android:text="Title Info"
         android:textSize="18sp"
-        android:text="New Text"
         android:id="@+id/txtLabel"
         android:paddingStart="5dp" />
 
@@ -35,9 +34,9 @@
         android:layout_height="wrap_content"
         android:text="subtitle"
         android:id="@+id/textView"
-        android:layout_toEndOf="@+id/homebuttonView"
+        android:layout_toEndOf="@+id/coverImage"
         android:textSize="14sp"
-        android:layout_alignBottom="@+id/homebuttonView"
+        android:layout_alignBottom="@+id/coverImage"
         android:paddingStart="5dp" />
 
 </RelativeLayout>
