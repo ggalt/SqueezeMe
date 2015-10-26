@@ -45,22 +45,12 @@ public class Setup extends AppCompatActivity {
     private EditText userName;
     private EditText passWord;
 
-    private static List<String> refVals;
 
     final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-    private List<String> prefList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        refVals.add(SERVER_IP_ID, "SERVER_IP_ID");
-        refVals.add(PLAYER_PORT_ID,"PLAYER_PORT_ID");
-        refVals.add(CLI_PORT_ID,"CLI_PORT_ID");
-        refVals.add(WEB_PORT_ID,"WEB_PORT_ID");
-        refVals.add(PLAYER_NAME_ID,"PLAYER_NAME_ID");
-        refVals.add(USERNAME_ID,"USERNAME_ID");
-        refVals.add(PASSWORD_ID,"PASSWORD_ID");
 
         setContentView(R.layout.activity_setup);
 
@@ -129,25 +119,25 @@ public class Setup extends AppCompatActivity {
     private boolean SetPreferenceValues(){
         SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString(refVals.get(SERVER_IP_ID), SERVER_IP);
-        editor.putString(refVals.get(PLAYER_PORT_ID), PLAYER_PORT);
-        editor.putString(refVals.get(CLI_PORT_ID), CLI_PORT);
-        editor.putString(refVals.get(WEB_PORT_ID), WEB_PORT);
-        editor.putString(refVals.get(PLAYER_NAME_ID), PLAYER_NAME);
-        editor.putString(refVals.get(USERNAME_ID), USERNAME);
-        editor.putString(refVals.get(PASSWORD_ID), PASSWORD);
+        editor.putString("SERVER_IP_ID", SERVER_IP);
+        editor.putString("PLAYER_PORT_ID", PLAYER_PORT);
+        editor.putString("CLI_PORT_ID", CLI_PORT);
+        editor.putString("WEB_PORT_ID", WEB_PORT);
+        editor.putString("PLAYER_NAME_ID", PLAYER_NAME);
+        editor.putString("USERNAME_ID", USERNAME);
+        editor.putString("PASSWORD_ID", PASSWORD);
         editor.commit();
         return true;
     }
     
     private void GetValues() {
-        SERVER_IP = prefs.getString(refVals.get(SERVER_IP_ID), DEFAULT_SERVER_IP);
-        PLAYER_PORT = prefs.getString(refVals.get(PLAYER_PORT_ID),DEFAULT_PLAYER_PORT );
-        CLI_PORT = prefs.getString(refVals.get(CLI_PORT_ID), DEFAULT_CLI_PORT);
-        WEB_PORT = prefs.getString(refVals.get(WEB_PORT_ID), DEFAULT_WEB_PORT);
-        PLAYER_NAME = prefs.getString(refVals.get(PLAYER_NAME_ID), DEFAULT_PLAYER_NAME);
-        USERNAME = prefs.getString(refVals.get(USERNAME_ID), DEFAULT_USERNAME);
-        PASSWORD = prefs.getString(refVals.get(PASSWORD_ID), DEFAULT_PASSWORD);
+        SERVER_IP = prefs.getString("SERVER_IP_ID", DEFAULT_SERVER_IP);
+        PLAYER_PORT = prefs.getString("PLAYER_PORT_ID", DEFAULT_PLAYER_PORT );
+        CLI_PORT = prefs.getString("CLI_PORT_ID", DEFAULT_CLI_PORT);
+        WEB_PORT = prefs.getString("WEB_PORT_ID", DEFAULT_WEB_PORT);
+        PLAYER_NAME = prefs.getString("PLAYER_NAME_ID", DEFAULT_PLAYER_NAME);
+        USERNAME = prefs.getString("USERNAME_ID", DEFAULT_USERNAME);
+        PASSWORD = prefs.getString("PASSWORD_ID", DEFAULT_PASSWORD);
     }
 
     private void SetScreenValues(){
