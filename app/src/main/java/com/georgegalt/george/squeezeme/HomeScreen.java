@@ -1,5 +1,7 @@
 package com.georgegalt.george.squeezeme;
 
+import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -7,10 +9,14 @@ import android.view.MenuItem;
 
 public class HomeScreen extends AppCompatActivity {
 
+    private ActionBar actionBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
+
+        actionBar = getSupportActionBar();
     }
 
     @Override
@@ -30,6 +36,11 @@ public class HomeScreen extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        if( id == R.id.action_setup_screen ) {
+            Intent showSetupActivityIntent = new Intent(HomeScreen.this, Setup.class);
+            startActivity(showSetupActivityIntent);
         }
 
         return super.onOptionsItemSelected(item);
