@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".HomeScreen"
+            android:name=".MainScreen"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,6 +19,8 @@
         <activity
             android:name=".Setup"
             android:label="@string/title_activity_setup" >
+        </activity>
+        <activity android:name=".HomeScreenFragment" >
         </activity>
     </application>
 
