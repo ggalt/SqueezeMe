@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SqueezeMe</string>
+    <string name="action_settings">Settings</string>
+    <string name="settings_reset_msg">Server Values Won\'t Update Until Saved</string>
+    <string name="settings_updated_msg">Server Values Updated</string>
+    <string name="settings_cancel_msg">Server Values Not Updated</string>
+</resources>
