@@ -45,10 +45,25 @@ public class ServerInfo {
     private static String PASSWORD;
 
     private SharedPreferences prefs;
+    // if false, we can't write to preference file because we don't have a context
+    private boolean bCanUpdate = false;
 
     public ServerInfo(Activity activity) {
         prefs = PreferenceManager.getDefaultSharedPreferences(activity.getBaseContext());
+        bCanUpdate = true;      // we have a context so allow updating
         readValues();
+    }
+
+    // this constructor is used when we want to use a copy of the information in the class
+    // where a context may not be available (or where we don't need to read and write)
+    public ServerInfo(ServerInfo s) {
+        SERVER_IP = s.getServerIP();
+        PLAYER_PORT = s.getPlayerPort();
+        CLI_PORT = s.getCliPort();
+        WEB_PORT = s.getWebPort();
+        PLAYER_NAME = s.getPlayerName();
+        USERNAME = s.getUSERNAME();
+        PASSWORD = s.getPASSWORD();
     }
 
     public String getServerIP() { return SERVER_IP;}
@@ -58,6 +73,8 @@ public class ServerInfo {
     public String getPlayerName() { return PLAYER_NAME; }
     public String getUSERNAME() { return USERNAME; }
     public String getPASSWORD() { return PASSWORD; }
+
+    public boolean isbCanUpdate() {return bCanUpdate;}
     
     public void setServerIP(String s) {SERVER_IP=s;}
     public void setPlayerPort(String s) {PLAYER_PORT=s;}
@@ -78,25 +95,29 @@ public class ServerInfo {
     }
 
     public void readValues(){
-        SERVER_IP = prefs.getString("SERVER_IP_ID", DEFAULT_SERVER_IP);
-        PLAYER_PORT = prefs.getString("PLAYER_PORT_ID", DEFAULT_PLAYER_PORT );
-        CLI_PORT = prefs.getString("CLI_PORT_ID", DEFAULT_CLI_PORT);
-        WEB_PORT = prefs.getString("WEB_PORT_ID", DEFAULT_WEB_PORT);
-        PLAYER_NAME = prefs.getString("PLAYER_NAME_ID", DEFAULT_PLAYER_NAME);
-        USERNAME = prefs.getString("USERNAME_ID", DEFAULT_USERNAME);
-        PASSWORD = prefs.getString("PASSWORD_ID", DEFAULT_PASSWORD);
+        if(bCanUpdate){
+            SERVER_IP = prefs.getString("SERVER_IP_ID", DEFAULT_SERVER_IP);
+            PLAYER_PORT = prefs.getString("PLAYER_PORT_ID", DEFAULT_PLAYER_PORT );
+            CLI_PORT = prefs.getString("CLI_PORT_ID", DEFAULT_CLI_PORT);
+            WEB_PORT = prefs.getString("WEB_PORT_ID", DEFAULT_WEB_PORT);
+            PLAYER_NAME = prefs.getString("PLAYER_NAME_ID", DEFAULT_PLAYER_NAME);
+            USERNAME = prefs.getString("USERNAME_ID", DEFAULT_USERNAME);
+            PASSWORD = prefs.getString("PASSWORD_ID", DEFAULT_PASSWORD);
+        }
     }
 
     public void writeValues(){
-        SharedPreferences.Editor editor = prefs.edit();
+        if(bCanUpdate){
+            SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString("SERVER_IP_ID", SERVER_IP);
-        editor.putString("PLAYER_PORT_ID", PLAYER_PORT);
-        editor.putString("CLI_PORT_ID", CLI_PORT);
-        editor.putString("WEB_PORT_ID", WEB_PORT);
-        editor.putString("PLAYER_NAME_ID", PLAYER_NAME);
-        editor.putString("USERNAME_ID", USERNAME);
-        editor.putString("PASSWORD_ID", PASSWORD);
-        editor.commit();
+            editor.putString("SERVER_IP_ID", SERVER_IP);
+            editor.putString("PLAYER_PORT_ID", PLAYER_PORT);
+            editor.putString("CLI_PORT_ID", CLI_PORT);
+            editor.putString("WEB_PORT_ID", WEB_PORT);
+            editor.putString("PLAYER_NAME_ID", PLAYER_NAME);
+            editor.putString("USERNAME_ID", USERNAME);
+            editor.putString("PASSWORD_ID", PASSWORD);
+            editor.commit();
+        }
     }
 }

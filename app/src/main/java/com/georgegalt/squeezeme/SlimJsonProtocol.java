@@ -21,10 +21,20 @@
 package com.georgegalt.squeezeme;
 
 /**
- * Created by ggalt66 on 11/18/2015.
+ * Created by ggalt66 on 11/24/2015.
  */
-public class SqueezeServerConnection {
-    private static final String TAG = "SqueezeServerConnection-Class";
+public class SlimJsonProtocol {
+    private static final String TAG = "SlimJsonProtocol-class";
 
+    private ServerInfo serverInfo;
+    private String jSonRequestAddress;
 
+    SlimJsonProtocol(ServerInfo s) {
+        serverInfo = new ServerInfo(s);
+        jSonRequestAddress = serverInfo.getServerIP()+":"+serverInfo.getWebPort()+"/jsonrpc.js";
+    }
+
+    public void GetArtistList(){
+
+    }
 }
