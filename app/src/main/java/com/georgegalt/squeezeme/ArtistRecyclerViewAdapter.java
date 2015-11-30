@@ -21,12 +21,12 @@
 package com.georgegalt.squeezeme;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.georgegalt.squeezeme.ArtistListFragment.OnListFragmentInteractionListener;
 import com.georgegalt.squeezeme.ContentTypes.ArtistContent.ArtistItem;
 
 import java.util.List;
@@ -39,9 +39,9 @@ import java.util.List;
 public class ArtistRecyclerViewAdapter extends RecyclerView.Adapter<ArtistRecyclerViewAdapter.ViewHolder> {
 
     private final List<ArtistItem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final ArtistListFragment.OnArtistListFragInteractionListener mListener;
 
-    public ArtistRecyclerViewAdapter(List<ArtistItem> items, OnListFragmentInteractionListener listener) {
+    public ArtistRecyclerViewAdapter(List<ArtistItem> items, ArtistListFragment.OnArtistListFragInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -65,7 +65,8 @@ public class ArtistRecyclerViewAdapter extends RecyclerView.Adapter<ArtistRecycl
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem, false);
+                    mListener.OnArtistListInteraction(holder.mItem, false);
+                    Log.d("Listen!!","short click");
                 }
             }
         });
@@ -75,7 +76,8 @@ public class ArtistRecyclerViewAdapter extends RecyclerView.Adapter<ArtistRecycl
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem, true);
+                    mListener.OnArtistListInteraction(holder.mItem, true);
+                    Log.d("Listen!!", "long click");
                     return true;
                 }
                 return false;

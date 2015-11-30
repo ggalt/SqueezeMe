@@ -27,7 +27,6 @@ import android.preference.PreferenceManager;
 public class ServerInfo {
     private static final String TAG = "ServerInfo-Class";
 
-
     private static final String DEFAULT_SERVER_IP = "127.0.0.1";
     private static final String DEFAULT_PLAYER_PORT = "3448";
     private static final String DEFAULT_CLI_PORT = "9090";
@@ -64,6 +63,16 @@ public class ServerInfo {
         PLAYER_NAME = s.getPlayerName();
         USERNAME = s.getUSERNAME();
         PASSWORD = s.getPASSWORD();
+    }
+
+    public ServerInfo() {
+        SERVER_IP = null;
+        PLAYER_PORT = null;
+        CLI_PORT = null;
+        WEB_PORT = null;
+        PLAYER_NAME = null;
+        USERNAME = null;
+        PASSWORD = null;
     }
 
     public String getServerIP() { return SERVER_IP;}

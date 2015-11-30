@@ -24,7 +24,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@drawable/gradient_vertical_black"
-    android:dividerPadding="5dp">
+    android:dividerPadding="5dp"
+    android:clickable="false">
 
     <ImageView
         android:layout_width="40dp"
@@ -43,6 +44,9 @@
         android:textColor="#ffffff"
         android:textSize="24dp"
         android:textStyle="italic"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:autoText="false"
+        android:maxLines="1"
+        android:nestedScrollingEnabled="true" />
 
 </LinearLayout>
