@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.List;
+
 // DEFAULT_SERVER_IP
 // DEFAULT_PLAYER_PORT
 // DEFAULT_CLI_PORT
@@ -42,6 +44,18 @@ public class ServerInfo {
     private static String PLAYER_NAME;
     private static String USERNAME;
     private static String PASSWORD;
+
+    /*
+     * These are volatile from one session to the next and son
+     * we don't store them in the preferences but gather them
+     * through server calls.
+     */
+    private String albumCount;
+    private String artistCount;
+    private String genreCount;
+    private String songCount;
+
+    private static List<String> favorites;
 
     private SharedPreferences prefs;
     // if false, we can't write to preference file because we don't have a context
@@ -83,8 +97,11 @@ public class ServerInfo {
     public String getUSERNAME() { return USERNAME; }
     public String getPASSWORD() { return PASSWORD; }
 
-    public boolean isbCanUpdate() {return bCanUpdate;}
-    
+    public String getAlbumCount() {return albumCount;}
+    public String getArtistCount() {return artistCount;}
+    public String getGenreCount() {return genreCount;}
+    public String getSongCount() {return songCount;}
+
     public void setServerIP(String s) {SERVER_IP=s;}
     public void setPlayerPort(String s) {PLAYER_PORT=s;}
     public void setCliPort(String s) {CLI_PORT=s;}
@@ -92,6 +109,13 @@ public class ServerInfo {
     public void setPlayerName(String s) {PLAYER_NAME=s;}
     public void setUSERNAME(String s) {USERNAME=s;}
     public void setPASSWORD(String s) {PASSWORD=s;}
+
+    public void setAlbumCount(String s) {albumCount = s;}
+    public void setArtistCount(String s) {artistCount = s;}
+    public void setGenreCount(String s) {genreCount = s;}
+    public void setSongCount(String s) { songCount = s;}
+
+    public boolean isbCanUpdate() {return bCanUpdate;}
 
     public void resetValues(){
         SERVER_IP = DEFAULT_SERVER_IP;

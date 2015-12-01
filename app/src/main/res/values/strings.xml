@@ -28,4 +28,9 @@
     <string name="Radio_Podcasts">Podcasts</string>
     <string name="My_Apps">My Apps</string>
     <string name="Favorites">Favorites</string>
+    <string name="Extras">Extras</string>
+    <string name="Extras_Alarm">Alarm Clock</string>
+    <string name="Extras_Music_Source">Music Source</string>
+    <string name="Extras_Image_Browser">Image Browser</string>
+    <string name="Extras_Info_Browser">Info Browser</string>
 </resources>

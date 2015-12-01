@@ -14,7 +14,7 @@
     <ExpandableListView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/mainScreenList"
+        android:id="@+id/homeScreenList"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 </RelativeLayout>

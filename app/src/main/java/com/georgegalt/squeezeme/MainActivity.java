@@ -3,16 +3,34 @@ package com.georgegalt.squeezeme;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.georgegalt.squeezeme.ContentTypes.AlbumContent;
 import com.georgegalt.squeezeme.ContentTypes.ArtistContent;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         ArtistListFragment.OnArtistListFragInteractionListener,
@@ -34,17 +52,197 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        serverInfo = new ServerInfo(this);
-
         artistListFragment = new ArtistListFragment();
         albumListFragment = new AlbumListFragment();
 
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.MainFrame, artistListFragment, "ArtistListFragment");
-        fragmentTransaction.addToBackStack("ArtistListFragment");
-        fragmentTransaction.commit();
+        GetServerBasics();
+
+//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+//        fragmentTransaction.add(R.id.MainFrame, artistListFragment, "ArtistListFragment");
+//        fragmentTransaction.addToBackStack("ArtistListFragment");
+//        fragmentTransaction.commit();
     }
 
+    /*
+     * Code for setting up home screen and responding to home screen interactions.
+     * Here we will also take a first pass at getting information from server so that
+     * we can populate "favorites" fields and other server information
+     */
+
+    private void GetServerBasics() {
+        Log.d(TAG,"GetServerBasics() started");
+        serverInfo = new ServerInfo(this);
+//        new GetServerBasicsTask().execute(serverInfo);
+        LoadHomePage();
+    }
+
+    //
+    private class GetServerBasicsTask extends AsyncTask<ServerInfo, Void, ServerInfo> {
+
+        @Override
+        protected ServerInfo doInBackground(ServerInfo... params) {
+            // this will request the serverstatus from the Squeezebox Server.  If the
+            // server call fails, we will return false.
+            // call to server is:
+            // "{\"id\":1,\"method\":\"slim.request\",\"params\":[\"\",[\"serverstatus\",\"0\",\"1000\",\"tags:g,a,l,t,e,y,d,c\"]]}"
+            // we'll just assume no one has more than 1000 players attached!!
+            String jsonRequest = "{\"id\":1,\"method\":\"slim.request\",\"params\":[\"\",[\"serverstatus\",\"0\",\"1000\",\"tags:g,a,l,t,e,y,d,c\"]]}";
+            DataOutputStream dataOutputStream;
+            InputStream dataInputStream;
+            URL url = null;
+            HttpURLConnection client = null;
+            ServerInfo serverInfo = new ServerInfo(params[0]);
+
+            try {
+                // Establish http connection
+                url = new URL("http://"+serverInfo.getServerIP()+":"
+                        +serverInfo.getWebPort()+"/jsonrpc.js" );
+                client = (HttpURLConnection) url.openConnection();
+                client.setDoOutput(true);
+                client.setDoInput(true);
+                client.setUseCaches(false);
+                client.setRequestProperty("Content-Type", "application/x-www-form-url encoded");
+                client.setRequestMethod("POST");
+                client.connect();
+
+                // Send the JSON object to the server
+                dataOutputStream = new DataOutputStream(client.getOutputStream());
+                dataOutputStream.writeBytes(jsonRequest);
+                dataOutputStream.flush();
+                dataOutputStream.close();
+
+                Integer response = (Integer)client.getResponseCode();
+                Log.d(TAG, "Response code is: " + response.toString());
+
+                // check to see if we got a good response
+                if( response == 200 ) {
+                    dataInputStream = client.getInputStream();
+                    BufferedReader streamReader = new BufferedReader(new InputStreamReader(dataInputStream, "UTF-8"));
+                    StringBuilder responseStrBuilder = new StringBuilder();
+
+                    String inputStr;
+                    while ((inputStr = streamReader.readLine()) != null)
+                        responseStrBuilder.append(inputStr);
+
+                    // get the response and process the 'result' object and 'artists_loop' array
+                    try {
+                        JSONObject jsonResponse = new JSONObject(responseStrBuilder.toString());
+                        JSONObject resultObj = jsonResponse.getJSONObject("result");
+                        JSONArray playersLoopArray = resultObj.getJSONArray("players_loop");
+
+                        for (int idx = 0; idx < playersLoopArray.length(); idx++) {
+                            Log.d(TAG,"Player Name: "+((JSONObject)playersLoopArray.get(idx)).getString("name"));
+                        }
+                        int iSongCount = jsonResponse.getInt("info total songs");
+                        int iAlbumCount = jsonResponse.getInt("info total albums");
+                        int iArtistCount = jsonResponse.getInt("info total artists");
+                        int iGenreCount = jsonResponse.getInt("info total genres");
+                        serverInfo.setArtistCount(new String() + iArtistCount);
+                        serverInfo.setAlbumCount(new String() + iAlbumCount);
+                        serverInfo.setSongCount(new String() + iSongCount);
+                        serverInfo.setGenreCount(new String() + iGenreCount);
+
+                    } catch (JSONException e) {
+                        Log.e(TAG,e.getLocalizedMessage());
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.e(TAG,"Bad Server Response Code : "+response);
+                    serverInfo = null;
+                    return serverInfo;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                client.disconnect();
+            }
+            return serverInfo;
+        }
+
+        @Override
+        protected void onPostExecute(ServerInfo result) {
+
+            if(result != null) {
+                serverInfo.setGenreCount(result.getGenreCount());
+                serverInfo.setSongCount(result.getSongCount());
+                serverInfo.setAlbumCount(result.getAlbumCount());
+                serverInfo.setArtistCount(result.getArtistCount());
+                LoadHomePage();
+            } else {
+                Toast.makeText(getApplicationContext(),"Failed to communicate with the server",Toast.LENGTH_LONG).show();
+            }
+
+        }
+    }
+
+    private void LoadHomePage() {
+        List<String> listDataHeader;
+        HashMap<String, List<String>> listDataChild;
+        ExpandableListView expandableListView;
+        HomePageExpandableListAdapter homePageExpandableListAdapter;
+
+        Resources resources = getResources();
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<String>>();
+
+        // create headers
+        listDataHeader.add(resources.getString(R.string.My_Music));
+        listDataHeader.add(resources.getString(R.string.Radio));
+        listDataHeader.add(resources.getString(R.string.My_Apps));
+        listDataHeader.add(resources.getString(R.string.Favorites));
+        listDataHeader.add(resources.getString(R.string.Extras));
+
+        // add children to headers
+        List<String> myMusic = new ArrayList<String>();
+        myMusic.add(resources.getString(R.string.My_Music_Artists));
+        myMusic.add(resources.getString(R.string.My_Music_Composers));
+        myMusic.add(resources.getString(R.string.My_Music_Albums));
+        myMusic.add(resources.getString(R.string.My_Music_Compilations));
+        myMusic.add(resources.getString(R.string.My_Music_Genres));
+        myMusic.add(resources.getString(R.string.My_Music_Years));
+        myMusic.add(resources.getString(R.string.My_Music_New_Music));
+        myMusic.add(resources.getString(R.string.My_Music_Random_Mix));
+        myMusic.add(resources.getString(R.string.My_Music_Folder));
+        myMusic.add(resources.getString(R.string.My_Music_Playlists));
+
+        List<String> Radio = new ArrayList<String>();
+        Radio.add(resources.getString(R.string.Radio_My_Presets));
+        Radio.add(resources.getString(R.string.Radio_Staff_Picks));
+        Radio.add(resources.getString(R.string.Radio_Local));
+        Radio.add(resources.getString(R.string.Radio_Music));
+        Radio.add(resources.getString(R.string.Radio_Talk));
+        Radio.add(resources.getString(R.string.Radio_News));
+        Radio.add(resources.getString(R.string.Radio_Sports));
+        Radio.add(resources.getString(R.string.Radio_Language));
+        Radio.add(resources.getString(R.string.Radio_World));
+        Radio.add(resources.getString(R.string.Radio_Podcasts));
+
+        List<String> myApps = new ArrayList<String>();
+
+        List<String> Favorites = new ArrayList<String>();
+
+        List<String> Extras = new ArrayList<String>();
+        Extras.add(resources.getString(R.string.Extras_Alarm));
+        Extras.add(resources.getString(R.string.Extras_Music_Source));
+        Extras.add(resources.getString(R.string.Extras_Image_Browser));
+        Extras.add(resources.getString(R.string.Extras_Info_Browser));
+
+        // add children to headers
+        listDataChild.put(listDataHeader.get(0),myMusic);
+        listDataChild.put(listDataHeader.get(1),Radio);
+        listDataChild.put(listDataHeader.get(2),myApps);
+        listDataChild.put(listDataHeader.get(3),Favorites);
+        listDataChild.put(listDataHeader.get(4),Extras);
+
+        expandableListView = (ExpandableListView)findViewById(R.id.homeScreenList);
+        homePageExpandableListAdapter = new HomePageExpandableListAdapter(this,listDataHeader,listDataChild);
+
+        expandableListView.setAdapter(homePageExpandableListAdapter);
+    }
+
+    /*
+     * Interaction with Options Menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -69,6 +267,9 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+     * Code for managing return from Setup Activity
+     */
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == Activity.RESULT_OK && requestCode == SETUP_REQUEST_CODE){
@@ -81,6 +282,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+
+    /*
+     * Listeners for Fragment interaction
+     */
     public void OnArtistListInteraction(ArtistContent.ArtistItem item, boolean isLongClick){
         if(isLongClick){
             Toast.makeText(getApplicationContext(), item.artistName, Toast.LENGTH_SHORT).show();

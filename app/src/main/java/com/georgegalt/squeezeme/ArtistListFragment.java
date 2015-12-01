@@ -147,7 +147,6 @@ public class ArtistListFragment extends Fragment {
 
     private class ArtistGetTask extends AsyncTask<Void, Void, ArtistContent> {
 
-
         @Override
         protected ArtistContent doInBackground(Void... params) {
             try {
