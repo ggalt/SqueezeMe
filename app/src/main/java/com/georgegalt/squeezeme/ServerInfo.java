@@ -50,12 +50,14 @@ public class ServerInfo {
      * we don't store them in the preferences but gather them
      * through server calls.
      */
-    private String albumCount;
-    private String artistCount;
-    private String genreCount;
-    private String songCount;
+    private static String albumCount;
+    private static String artistCount;
+    private static String genreCount;
+    private static String songCount;
 
     private static List<String> favorites;
+
+    private static List<PlayerInfo> players;
 
     private SharedPreferences prefs;
     // if false, we can't write to preference file because we don't have a context
@@ -96,6 +98,9 @@ public class ServerInfo {
     public String getPlayerName() { return PLAYER_NAME; }
     public String getUSERNAME() { return USERNAME; }
     public String getPASSWORD() { return PASSWORD; }
+
+    public List<String> getFavorites() {return favorites;}
+    public List<PlayerInfo> getPlayers() {return players;}
 
     public String getAlbumCount() {return albumCount;}
     public String getArtistCount() {return artistCount;}
@@ -153,4 +158,11 @@ public class ServerInfo {
             editor.commit();
         }
     }
+}
+
+class PlayerInfo {
+    String name;
+    String id;
+    String macAddress;
+    String ipAddress;
 }
