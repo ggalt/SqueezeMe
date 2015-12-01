@@ -21,14 +21,16 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clickable="false">
 
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft">
+        android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:clickable="false">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,7 +44,9 @@
             android:textSize="17dp"
             android:layout_gravity="center_vertical"
             android:padding="5dp"
-            android:layout_marginLeft="5dp" />
+            android:layout_marginLeft="5dp"
+            android:clickable="false"
+            android:focusable="false" />
 
     </LinearLayout>
 </LinearLayout>

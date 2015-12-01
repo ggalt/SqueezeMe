@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -44,6 +45,9 @@ public class MainActivity extends AppCompatActivity implements
     ArtistListFragment artistListFragment;
     AlbumListFragment albumListFragment;
 
+    ExpandableListView expandableListView;
+    HomePageExpandableListAdapter homePageExpandableListAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +60,6 @@ public class MainActivity extends AppCompatActivity implements
         albumListFragment = new AlbumListFragment();
 
         GetServerBasics();
-
-//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-//        fragmentTransaction.add(R.id.MainFrame, artistListFragment, "ArtistListFragment");
-//        fragmentTransaction.addToBackStack("ArtistListFragment");
-//        fragmentTransaction.commit();
     }
 
     /*
@@ -72,8 +71,8 @@ public class MainActivity extends AppCompatActivity implements
     private void GetServerBasics() {
         Log.d(TAG,"GetServerBasics() started");
         serverInfo = new ServerInfo(this);
-//        new GetServerBasicsTask().execute(serverInfo);
-        LoadHomePage();
+        new GetServerBasicsTask().execute(serverInfo);
+//        LoadHomePage();
     }
 
     //
@@ -124,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements
                     while ((inputStr = streamReader.readLine()) != null)
                         responseStrBuilder.append(inputStr);
 
+                    Log.d(TAG,"Server responded with: "+responseStrBuilder.toString());
                     // get the response and process the 'result' object and 'artists_loop' array
                     try {
                         JSONObject jsonResponse = new JSONObject(responseStrBuilder.toString());
@@ -133,10 +133,10 @@ public class MainActivity extends AppCompatActivity implements
                         for (int idx = 0; idx < playersLoopArray.length(); idx++) {
                             Log.d(TAG,"Player Name: "+((JSONObject)playersLoopArray.get(idx)).getString("name"));
                         }
-                        int iSongCount = jsonResponse.getInt("info total songs");
-                        int iAlbumCount = jsonResponse.getInt("info total albums");
-                        int iArtistCount = jsonResponse.getInt("info total artists");
-                        int iGenreCount = jsonResponse.getInt("info total genres");
+                        int iSongCount = resultObj.getInt("info total songs");
+                        int iAlbumCount = resultObj.getInt("info total albums");
+                        int iArtistCount = resultObj.getInt("info total artists");
+                        int iGenreCount = resultObj.getInt("info total genres");
                         serverInfo.setArtistCount(new String() + iArtistCount);
                         serverInfo.setAlbumCount(new String() + iAlbumCount);
                         serverInfo.setSongCount(new String() + iSongCount);
@@ -167,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements
                 serverInfo.setSongCount(result.getSongCount());
                 serverInfo.setAlbumCount(result.getAlbumCount());
                 serverInfo.setArtistCount(result.getArtistCount());
+                Log.d(TAG,"Artist Count is: "+serverInfo.getArtistCount());
                 LoadHomePage();
             } else {
                 Toast.makeText(getApplicationContext(),"Failed to communicate with the server",Toast.LENGTH_LONG).show();
@@ -176,10 +177,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void LoadHomePage() {
-        List<String> listDataHeader;
-        HashMap<String, List<String>> listDataChild;
-        ExpandableListView expandableListView;
-        HomePageExpandableListAdapter homePageExpandableListAdapter;
+        final List<String> listDataHeader;
+        final HashMap<String, List<String>> listDataChild;
 
         Resources resources = getResources();
         listDataHeader = new ArrayList<String>();
@@ -229,13 +228,30 @@ public class MainActivity extends AppCompatActivity implements
 
         // add children to headers
         listDataChild.put(listDataHeader.get(0),myMusic);
-        listDataChild.put(listDataHeader.get(1),Radio);
-        listDataChild.put(listDataHeader.get(2),myApps);
+        listDataChild.put(listDataHeader.get(1), Radio);
+        listDataChild.put(listDataHeader.get(2), myApps);
         listDataChild.put(listDataHeader.get(3),Favorites);
         listDataChild.put(listDataHeader.get(4),Extras);
 
         expandableListView = (ExpandableListView)findViewById(R.id.homeScreenList);
+        expandableListView.setClickable(true);
         homePageExpandableListAdapter = new HomePageExpandableListAdapter(this,listDataHeader,listDataChild);
+
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long id) {
+                Log.d(TAG,"onChildClick");
+                Toast.makeText(getApplicationContext(),
+                        listDataHeader.get(groupPosition)
+                                +" : "
+                                +listDataChild.get(listDataHeader.get(groupPosition))
+                                .get(childPosition),
+                        Toast.LENGTH_SHORT)
+                        .show();
+                HomePageSelection(groupPosition,childPosition);
+                return false;
+            }
+        });
 
         expandableListView.setAdapter(homePageExpandableListAdapter);
     }
@@ -306,6 +322,110 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onAlbumListInteraction(AlbumContent.AlbumItem item, boolean isLongClick) {
 
+    }
+
+    /*
+     * Switch statement for home page option selection
+     */
+
+    private void HomePageSelection(int group, int child) {
+        switch (group) {
+            case 0:     // My Music
+                switch (child) {
+                    case 0:     // Artist
+                        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                        fragmentTransaction.add(R.id.MainFrame, artistListFragment, "ArtistListFragment");
+                        fragmentTransaction.addToBackStack("ArtistListFragment");
+                        fragmentTransaction.commit();
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        break;
+                    case 10:
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 1:     // Radio
+                switch (child) {
+                    case 0:
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        break;
+                    case 10:
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 2:     // My Apps
+                break;
+            case 3:     // Favorites
+                break;
+            case 4:     // Extras
+                switch (child) {
+                    case 0:
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        break;
+                    case 10:
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+
+        }
     }
 }
 
