@@ -59,7 +59,6 @@ public class ArtistListFragment extends Fragment {
 
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    ServerInfo serverInfo;
     private String displayCmd = null;
 
     private OnArtistListFragInteractionListener mListener;
@@ -80,7 +79,6 @@ public class ArtistListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        serverInfo = new ServerInfo(getActivity());
         Bundle bundle = getArguments();
         if(bundle!=null) {
             if(bundle.containsKey(SERVER_CMD)) {
@@ -211,8 +209,9 @@ public class ArtistListFragment extends Fragment {
             HttpURLConnection client = null;
             try {
                 // Establish http connection
-                url = new URL("http://"+serverInfo.getServerIP()+":"
-                        +serverInfo.getWebPort()+"/jsonrpc.js" );
+                url = new URL("http://"+MainActivity.serverInfo.getServerIP()+":"
+                        +MainActivity.serverInfo.getWebPort()+"/jsonrpc.js" );
+                Log.d(TAG,"Full URL request is: "+url.toString());
                 client = (HttpURLConnection) url.openConnection();
                 client.setDoOutput(true);
                 client.setDoInput(true);
@@ -249,10 +248,8 @@ public class ArtistListFragment extends Fragment {
                 JSONArray artistLoopObject = resultObj.getJSONArray("artists_loop");
 
                 for (int idx = 0; idx < artistLoopObject.length(); idx++) {
-//                for (int idx = 0; idx < 50; idx++) {
                     JSONObject artist = (JSONObject) artistLoopObject.get(idx);
                     artistContent.addItem(new ArtistItem(artist.getString("id"), artist.getString("artist"), artist.getString("textkey")));
-//                    Log.d(TAG, "artist:" + artist.get("artist"));
                 }
 
             } catch (IOException e) {

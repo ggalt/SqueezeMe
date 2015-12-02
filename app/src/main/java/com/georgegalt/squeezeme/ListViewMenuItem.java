@@ -30,9 +30,50 @@ import java.net.URL;
  * Basic class to hold a menu item for a list view
  */
 public class ListViewMenuItem {
-    private String sTitle;
-    private String sSubTitle;
+    private String Title;
+    private String SubTitle;
     private URL imageURL;
     private String clickCmd;
     private String longClickCmd;
+
+    public String getTitle() {
+        return Title;
+    }
+
+    public void setTitle(String title) {
+        Title = title;
+    }
+
+    public String getSubTitle() {
+        return SubTitle;
+    }
+
+    public void setSubTitle(String subTitle) {
+        SubTitle = subTitle;
+    }
+
+    public URL getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(URL imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public String getClickCmd() {
+        return clickCmd;
+    }
+
+    public void setClickCmd(String clickCmd) {
+        this.clickCmd = clickCmd;
+    }
+
+    public String getLongClickCmd() {
+        return longClickCmd;
+    }
+
+    public void setLongClickCmd(String longClickCmd) {
+        this.longClickCmd = longClickCmd;
+    }
+
 }

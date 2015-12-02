@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity implements
     private static final String SERVER_CMD = "Server_command";
 
     public static final int SETUP_REQUEST_CODE = 0;
-    ServerInfo serverInfo;
-    ArtistListFragment artistListFragment;
-    AlbumListFragment albumListFragment;
+    public static ServerInfo serverInfo;
+    private ArtistListFragment artistListFragment;
+    private AlbumListFragment albumListFragment;
 
     ExpandableListView expandableListView;
     HomePageExpandableListAdapter homePageExpandableListAdapter;
@@ -71,15 +71,16 @@ public class MainActivity extends AppCompatActivity implements
     private void GetServerBasics() {
         Log.d(TAG,"GetServerBasics() started");
         serverInfo = new ServerInfo(this);
-        new GetServerBasicsTask().execute(serverInfo);
+        new GetServerBasicsTask().execute();
 //        LoadHomePage();
     }
 
     //
-    private class GetServerBasicsTask extends AsyncTask<ServerInfo, Void, ServerInfo> {
+//    private class GetServerBasicsTask extends AsyncTask<ServerInfo, void, ServerInfo> {
+    private class GetServerBasicsTask extends AsyncTask<Void, Void, Integer> {
 
         @Override
-        protected ServerInfo doInBackground(ServerInfo... params) {
+        protected Integer doInBackground(Void ... params) {
             // this will request the serverstatus from the Squeezebox Server.  If the
             // server call fails, we will return false.
             // call to server is:
@@ -90,7 +91,8 @@ public class MainActivity extends AppCompatActivity implements
             InputStream dataInputStream;
             URL url = null;
             HttpURLConnection client = null;
-            ServerInfo serverInfo = new ServerInfo(params[0]);
+//            ServerInfo serverInfo = new ServerInfo(params[0]);
+            Integer response = 0;
 
             try {
                 // Establish http connection
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements
                 dataOutputStream.flush();
                 dataOutputStream.close();
 
-                Integer response = (Integer)client.getResponseCode();
+                response = (Integer)client.getResponseCode();
                 Log.d(TAG, "Response code is: " + response.toString());
 
                 // check to see if we got a good response
@@ -143,36 +145,31 @@ public class MainActivity extends AppCompatActivity implements
                         serverInfo.setGenreCount(new String() + iGenreCount);
 
                     } catch (JSONException e) {
-                        Log.e(TAG,e.getLocalizedMessage());
+                        Log.e(TAG,"JSONException: "+e.getLocalizedMessage());
                         e.printStackTrace();
                     }
                 } else {
                     Log.e(TAG,"Bad Server Response Code : "+response);
-                    serverInfo = null;
-                    return serverInfo;
+                    return response;
                 }
             } catch (IOException e) {
+                Log.e(TAG,"IOException: " + e.getLocalizedMessage());
                 e.printStackTrace();
             } finally {
                 client.disconnect();
             }
-            return serverInfo;
+            return response;
         }
 
         @Override
-        protected void onPostExecute(ServerInfo result) {
+        protected void onPostExecute(Integer result) {
 
-            if(result != null) {
-                serverInfo.setGenreCount(result.getGenreCount());
-                serverInfo.setSongCount(result.getSongCount());
-                serverInfo.setAlbumCount(result.getAlbumCount());
-                serverInfo.setArtistCount(result.getArtistCount());
-                Log.d(TAG,"Artist Count is: "+serverInfo.getArtistCount());
-                LoadHomePage();
+            if(result != 200) {
+                Toast.makeText(getApplicationContext(),"Failed to communicate with the server.  Response code was: " + result,Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(getApplicationContext(),"Failed to communicate with the server",Toast.LENGTH_LONG).show();
+                LoadHomePage();
+                Log.d(TAG, "Test to see if serverInfo is updated.  Artist count is: " + serverInfo.getArtistCount());
             }
-
         }
     }
 
@@ -309,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             Log.d(TAG, "Click was short: " + item.artistName);
             Bundle bundle = new Bundle();
-            bundle.putString(SERVER_CMD,"[\"\",[\"albums\",\"0\",\"\",\"tags:s\"]");
+            bundle.putString(SERVER_CMD,"[\"\",[\"albums\",\"0\",\"1000\",\"artist_id:"+item.id+"\",\"tags:l,j,S,s\"]");
             albumListFragment.setArguments(bundle);
 
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();

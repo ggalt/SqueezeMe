@@ -57,7 +57,6 @@ public class AlbumListFragment extends Fragment {
     private int mColumnCount = 1;
     private OnAlbumListFragInteractionListener mListener;
 
-    ServerInfo serverInfo;
     private String displayCmd = null;
 
     // need to keep View at the class level so we can use it
@@ -75,7 +74,12 @@ public class AlbumListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        serverInfo = new ServerInfo(getActivity());
+        Bundle bundle = getArguments();
+        if(bundle!=null) {
+            if(bundle.containsKey(SERVER_CMD)) {
+                displayCmd = bundle.getString(SERVER_CMD);
+            }
+        }
     }
 
     @Override
@@ -177,7 +181,11 @@ public class AlbumListFragment extends Fragment {
     }
 
     private AlbumContent GetAlbums() throws IOException {
-        return GetAlbums("[\"\",[\"albums\",\"0\",\"\",\"tags:l,j,S,s\"]]");
+        if(displayCmd!=null) {
+            Log.d(TAG, "Executing command: "+displayCmd);
+            return GetAlbums(displayCmd);
+        }
+        return GetAlbums("[\"\",[\"albums\",\"0\",\""+MainActivity.serverInfo.getAlbumCount()+"\",\"tags:l,j,S,s\"]]");
     }
 
     private AlbumContent GetAlbums(String albumCmd ) throws IOException {
@@ -192,12 +200,7 @@ public class AlbumListFragment extends Fragment {
         // the letter by which the artist is alphabetized).
         // we may have started with a request for a specific artist, which will have come
         // through as "displayCmd", so format a command if it is available.
-        String slimRequest;
-        if(albumCmd!=null){
-            slimRequest = "{\"id\":1,\"method\":\"slim.request\",\"params\":"+albumCmd+"}";
-        } else {
-            slimRequest = "{\"id\":1,\"method\":\"slim.request\",\"params\":[\"\",[\"albums\",\"0\",\"\",\"tags:l,j,S,s\"]]}";
-        }
+        String slimRequest = "{\"id\":1,\"method\":\"slim.request\",\"params\":"+albumCmd+"]}";
 
         Log.d(TAG, "cmd issued to server: "+slimRequest);
         JSONObject jsonSlimRequest = null;
@@ -213,8 +216,8 @@ public class AlbumListFragment extends Fragment {
             HttpURLConnection client = null;
             try {
                 // Establish http connection
-                url = new URL("http://"+serverInfo.getServerIP()+":"
-                        +serverInfo.getWebPort()+"/jsonrpc.js" );
+                url = new URL("http://"+MainActivity.serverInfo.getServerIP()+":"
+                        +MainActivity.serverInfo.getWebPort()+"/jsonrpc.js" );
                 client = (HttpURLConnection) url.openConnection();
                 client.setDoOutput(true);
                 client.setDoInput(true);

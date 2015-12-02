@@ -82,13 +82,6 @@ public class ServerInfo {
     }
 
     public ServerInfo() {
-        SERVER_IP = null;
-        PLAYER_PORT = null;
-        CLI_PORT = null;
-        WEB_PORT = null;
-        PLAYER_NAME = null;
-        USERNAME = null;
-        PASSWORD = null;
     }
 
     public String getServerIP() { return SERVER_IP;}
