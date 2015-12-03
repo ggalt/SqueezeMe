@@ -31,4 +31,4 @@
     app:layoutManager="LinearLayoutManager"
     tools:context="com.georgegalt.squeezeme.AlbumListFragment"
     tools:listitem="@layout/fragment_albumlist"
-    android:background="@drawable/gradient_steel" />
+    android:background="@drawable/gradient_new_steel" />

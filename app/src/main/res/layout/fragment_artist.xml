@@ -23,7 +23,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@drawable/gradient_alpha"
+    android:background="@drawable/gradient_black_center_white"
     android:dividerPadding="5dp"
     android:clickable="false">
 
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:text="ArtistName"
         android:id="@+id/txtAartistName"
-        android:textColor="#ffffff"
+        android:textColor="@android:color/background_dark"
         android:textSize="24dp"
         android:textStyle="italic"
         android:layout_gravity="center_vertical"

@@ -21,6 +21,7 @@
 package com.georgegalt.squeezeme;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 
 import com.georgegalt.squeezeme.AlbumListFragment.OnAlbumListFragInteractionListener;
 import com.georgegalt.squeezeme.ContentTypes.AlbumContent.AlbumItem;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -38,9 +40,11 @@ import java.util.List;
  * TODO: Replace the implementation with code for your data type.
  */
 public class AlbumListRecyclerViewAdapter extends RecyclerView.Adapter<AlbumListRecyclerViewAdapter.ViewHolder> {
+    private static final String TAG = "AlbumListRecyclerViewAdapter";
 
     private final List<AlbumItem> mValues;
     private final OnAlbumListFragInteractionListener mListener;
+    View view;
 
     public AlbumListRecyclerViewAdapter(List<AlbumItem> items, OnAlbumListFragInteractionListener listener) {
         mValues = items;
@@ -49,7 +53,7 @@ public class AlbumListRecyclerViewAdapter extends RecyclerView.Adapter<AlbumList
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_albumlist, parent, false);
         return new ViewHolder(view);
     }
@@ -59,6 +63,9 @@ public class AlbumListRecyclerViewAdapter extends RecyclerView.Adapter<AlbumList
         holder.mItem = mValues.get(position);
         holder.mAlbumTitle.setText(mValues.get(position).albumName);
         holder.mArtistName.setText(mValues.get(position).artistName);
+        String url = "http://" + ServerInfo.getServerIP() + ":" + ServerInfo.getWebPort()
+                + "/music/" + mValues.get(position).artworkID + "/cover";
+        Picasso.with(holder.mView.getContext()).load(url).resize(50,50).into(holder.mImage);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

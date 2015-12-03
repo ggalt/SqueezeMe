@@ -11,7 +11,7 @@
   ~ This program is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
   ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more textKey.
+  ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program; if not, write to the Free Software
@@ -19,16 +19,12 @@
   ~
   -->
 
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
-    android:name="com.georgegalt.squeezeme.ArtistLIstFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".ArtistListFragment"
-    tools:listitem="@layout/fragment_artist"
-    android:background="@drawable/gradient_new_steel" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle" >
+    <gradient
+        android:type="linear"
+        android:centerX="70%"
+        android:startColor="#FFffffff"
+        android:centerColor="#FF000000"
+        android:endColor="#a2000000"
+        android:angle="315"/>
+</shape>
