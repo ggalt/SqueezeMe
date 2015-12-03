@@ -24,6 +24,9 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +34,7 @@ import android.view.ViewGroup;
 
 import com.georgegalt.squeezeme.ContentTypes.AlbumContent;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -162,21 +166,21 @@ public class AlbumListFragment extends Fragment {
 
         @Override
         protected void onPostExecute(AlbumContent albumContent) {
-            // fill adapter with http asynctask request
-            // Set the adapter
-//            if (view instanceof RecyclerView) {
-//                Context context = view.getContext();
-//                RecyclerView recyclerView = (RecyclerView) view;
-//                if (mColumnCount <= 1) {
-//                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//                } else {
-//                    recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-//                }
-//                if(mListener==null) {
-//                    Log.d(TAG,"listener is null");
-//                }
-//                recyclerView.setAdapter(new ArtistRecyclerViewAdapter(AlbumContent.ITEMS, mListener));
-//            }
+//             fill adapter with http asynctask request
+//             Set the adapter
+            if (view instanceof RecyclerView) {
+                Context context = view.getContext();
+                RecyclerView recyclerView = (RecyclerView) view;
+                if (mColumnCount <= 1) {
+                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                } else {
+                    recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                }
+                if(mListener==null) {
+                    Log.d(TAG,"listener is null");
+                }
+                recyclerView.setAdapter(new AlbumListRecyclerViewAdapter(AlbumContent.ITEMS, mListener));
+            }
         }
     }
 
@@ -249,17 +253,20 @@ public class AlbumListFragment extends Fragment {
                 Log.d(TAG,"response length is: "+responseStrBuilder.toString().length());
                 Log.d(TAG,responseStrBuilder.toString());
 
-//                // get the response and process the 'result' object and 'artists_loop' array
-//                JSONObject jsonResponse = new JSONObject(responseStrBuilder.toString());
-//                JSONObject resultObj = jsonResponse.getJSONObject("result");
-//                JSONArray artistLoopObject = resultObj.getJSONArray("artists_loop");
-//
-//                for (int idx = 0; idx < artistLoopObject.length(); idx++) {
-////                for (int idx = 0; idx < 50; idx++) {
-//                    JSONObject artist = (JSONObject) artistLoopObject.get(idx);
-////                    albumContent.addItem(new ArtistItem(artist.getString("id"), artist.getString("artist"), artist.getString("textkey")));
-////                    Log.d(TAG, "artist:" + artist.get("artist"));
-//                }
+                // get the response and process the 'result' object and 'albums_loop' array
+                JSONObject jsonResponse = new JSONObject(responseStrBuilder.toString());
+                JSONObject resultObj = jsonResponse.getJSONObject("result");
+                JSONArray albumLoopObject = resultObj.getJSONArray("albums_loop");
+
+                for (int idx = 0; idx < albumLoopObject.length(); idx++) {
+                    JSONObject album = (JSONObject) albumLoopObject.get(idx);
+                    albumContent.addItem(new AlbumContent.AlbumItem(
+                            album.getString("id"),
+                            album.getString("artist_id"),
+                            album.getString("album"),
+                            album.getString("artwork_track_id"),
+                            album.getString("textkey")));
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();

@@ -30,4 +30,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ArtistListFragment"
-    tools:listitem="@layout/fragment_artist" />
+    tools:listitem="@layout/fragment_artist"
+    android:background="@drawable/gradient_steel" />

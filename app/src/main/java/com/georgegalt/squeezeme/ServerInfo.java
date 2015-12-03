@@ -59,6 +59,8 @@ public class ServerInfo {
 
     private static List<PlayerInfo> players;
 
+    private static String thisPlayerID;     // mac address for this device
+
     private SharedPreferences prefs;
     // if false, we can't write to preference file because we don't have a context
     private boolean bCanUpdate = false;
@@ -84,21 +86,25 @@ public class ServerInfo {
     public ServerInfo() {
     }
 
-    public String getServerIP() { return SERVER_IP;}
-    public String getPlayerPort() { return PLAYER_PORT; }
-    public String getCliPort() { return CLI_PORT; }
-    public String getWebPort() { return WEB_PORT; }
-    public String getPlayerName() { return PLAYER_NAME; }
-    public String getUSERNAME() { return USERNAME; }
-    public String getPASSWORD() { return PASSWORD; }
+    public static String getServerIP() { return SERVER_IP;}
+    public static String getPlayerPort() { return PLAYER_PORT; }
+    public static String getCliPort() { return CLI_PORT; }
+    public static String getWebPort() { return WEB_PORT; }
+    public static String getPlayerName() { return PLAYER_NAME; }
+    public static String getUSERNAME() { return USERNAME; }
+    public static String getPASSWORD() { return PASSWORD; }
 
-    public List<String> getFavorites() {return favorites;}
-    public List<PlayerInfo> getPlayers() {return players;}
+    public static List<String> getFavorites() {return favorites;}
+    public static List<PlayerInfo> getPlayers() {return players;}
 
-    public String getAlbumCount() {return albumCount;}
-    public String getArtistCount() {return artistCount;}
-    public String getGenreCount() {return genreCount;}
-    public String getSongCount() {return songCount;}
+    public static String getAlbumCount() {return albumCount;}
+    public static String getArtistCount() {return artistCount;}
+    public static String getGenreCount() {return genreCount;}
+    public static String getSongCount() {return songCount;}
+
+    public static String getThisPlayerID() {
+        return thisPlayerID;
+    }
 
     public void setServerIP(String s) {SERVER_IP=s;}
     public void setPlayerPort(String s) {PLAYER_PORT=s;}
@@ -114,6 +120,10 @@ public class ServerInfo {
     public void setSongCount(String s) { songCount = s;}
 
     public boolean isbCanUpdate() {return bCanUpdate;}
+
+    public static void setThisPlayerID(String thisPlayerID) {
+        ServerInfo.thisPlayerID = thisPlayerID;
+    }
 
     public void resetValues(){
         SERVER_IP = DEFAULT_SERVER_IP;
@@ -154,8 +164,51 @@ public class ServerInfo {
 }
 
 class PlayerInfo {
-    String name;
-    String id;
-    String macAddress;
-    String ipAddress;
+    private String name;
+    private String id;
+    private String macAddress;
+    private String ipAddress;
+
+    PlayerInfo(){
+
+    }
+
+    PlayerInfo(String name, String id, String macAddress, String ipAddress) {
+        this.name = name;
+        this.id = id;
+        this.macAddress = macAddress;
+        this.ipAddress = ipAddress;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
 }

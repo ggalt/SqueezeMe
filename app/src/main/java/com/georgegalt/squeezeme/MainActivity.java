@@ -2,8 +2,15 @@ package com.georgegalt.squeezeme;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements
     public static ServerInfo serverInfo;
     private ArtistListFragment artistListFragment;
     private AlbumListFragment albumListFragment;
+    private String macAddress;
 
     ExpandableListView expandableListView;
     HomePageExpandableListAdapter homePageExpandableListAdapter;
@@ -59,7 +67,10 @@ public class MainActivity extends AppCompatActivity implements
         artistListFragment = new ArtistListFragment();
         albumListFragment = new AlbumListFragment();
 
-        GetServerBasics();
+        if(GetConnectedState() ) {
+            Log.d(TAG, "Connected");
+            GetServerBasics();
+        }
     }
 
     /*
@@ -133,16 +144,22 @@ public class MainActivity extends AppCompatActivity implements
                         JSONArray playersLoopArray = resultObj.getJSONArray("players_loop");
 
                         for (int idx = 0; idx < playersLoopArray.length(); idx++) {
-                            Log.d(TAG,"Player Name: "+((JSONObject)playersLoopArray.get(idx)).getString("name"));
+//                            serverInfo.getPlayers().add(new PlayerInfo(
+//                                    ((JSONObject)playersLoopArray.get(idx)).getString("name"),
+//                                    ((JSONObject)playersLoopArray.get(idx)).getString("uuid"),
+//                                    ((JSONObject)playersLoopArray.get(idx)).getString("playerid"),
+//                                    ((JSONObject)playersLoopArray.get(idx)).getString("ip")
+//                            ));
+                            Log.d(TAG, "Player Name: " + ((JSONObject) playersLoopArray.get(idx)).getString("name"));
                         }
                         int iSongCount = resultObj.getInt("info total songs");
                         int iAlbumCount = resultObj.getInt("info total albums");
                         int iArtistCount = resultObj.getInt("info total artists");
                         int iGenreCount = resultObj.getInt("info total genres");
-                        serverInfo.setArtistCount(new String() + iArtistCount);
-                        serverInfo.setAlbumCount(new String() + iAlbumCount);
-                        serverInfo.setSongCount(new String() + iSongCount);
-                        serverInfo.setGenreCount(new String() + iGenreCount);
+                        serverInfo.setArtistCount(String.valueOf(iArtistCount));
+                        serverInfo.setAlbumCount(String.valueOf(iAlbumCount));
+                        serverInfo.setSongCount(String.valueOf(iSongCount));
+                        serverInfo.setGenreCount(String.valueOf(iGenreCount));
 
                     } catch (JSONException e) {
                         Log.e(TAG,"JSONException: "+e.getLocalizedMessage());
@@ -309,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements
             bundle.putString(SERVER_CMD,"[\"\",[\"albums\",\"0\",\"1000\",\"artist_id:"+item.id+"\",\"tags:l,j,S,s\"]");
             albumListFragment.setArguments(bundle);
 
+//            changeFragment(albumListFragment, true);
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.MainFrame,albumListFragment);
             fragmentTransaction.addToBackStack("AlbumListFragment");
@@ -330,10 +348,12 @@ public class MainActivity extends AppCompatActivity implements
             case 0:     // My Music
                 switch (child) {
                     case 0:     // Artist
+//                        changeFragment(artistListFragment,true);
                         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                         fragmentTransaction.add(R.id.MainFrame, artistListFragment, "ArtistListFragment");
                         fragmentTransaction.addToBackStack("ArtistListFragment");
                         fragmentTransaction.commit();
+                        expandableListView.setVisibility(View.INVISIBLE);
                         break;
                     case 1:
                         break;
@@ -422,6 +442,91 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 break;
 
+        }
+    }
+
+    // find out if we are on WiFi and get MAC address
+    private boolean GetConnectedState() {
+        boolean isWiFi = false;
+        try {
+            ConnectivityManager cm =
+                    (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+            isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+
+            WifiManager wifi = (WifiManager) this
+                    .getSystemService(this.WIFI_SERVICE);
+            wifi.setWifiEnabled(true);
+            WifiInfo info = wifi.getConnectionInfo();
+            macAddress = info.getMacAddress();
+
+            if (macAddress == null) {
+                Toast.makeText(this, "Null", Toast.LENGTH_LONG).show();
+                serverInfo.setThisPlayerID(macAddress);
+            } else {
+                Toast.makeText(this, macAddress, Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+        }
+        return isWiFi;
+    }
+
+    /**
+     * Change the current displayed fragment managing fragment backstack
+     *
+     * @param frag the fragment to display
+     * @param saveInBackStack true if you want the previous to be in backstack
+     */
+    private void changeFragment(Fragment frag, boolean saveInBackStack) {
+        String backStateName = ((Object) frag).getClass().getName();
+
+        try {
+            FragmentManager manager = getFragmentManager();
+            if(manager.getBackStackEntryCount()==0) {
+                Log.d(TAG,"Hide ExpandableListView");
+                expandableListView.setVisibility(View.INVISIBLE);
+            }
+            boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
+
+            if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) { //fragment not in back stack, create it.
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.MainFrame, frag, ((Object) frag).getClass().getName());
+
+                if (saveInBackStack) {
+                    Log.d(TAG, "Change Fragment : addToBackTack");
+                    transaction.addToBackStack(backStateName);
+                } else {
+                    Log.d(TAG, "Change Fragment : NO addToBackTack");
+                }
+
+                transaction.commit();
+            } else {
+                Log.d(TAG, "Change Fragment : nothing to do");
+                // custom effect if fragment is already instanciated
+            }
+        } catch (IllegalStateException exception) {
+            Log.e(TAG, "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        int fragments = getFragmentManager().getBackStackEntryCount();
+        Log.d(TAG, "Fragment Count is: " + fragments);
+        switch (fragments) {
+            case 0:
+                super.onBackPressed();
+                break;
+            case 1:
+                expandableListView.setVisibility(View.VISIBLE);
+                /// NOTE: fall through
+            default:
+                getFragmentManager().popBackStack();
+                break;
         }
     }
 }

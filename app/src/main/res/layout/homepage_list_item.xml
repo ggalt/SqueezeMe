@@ -46,7 +46,8 @@
             android:padding="5dp"
             android:layout_marginLeft="5dp"
             android:clickable="false"
-            android:focusable="false" />
+            android:focusable="false"
+            android:textColor="#ffffff" />
 
     </LinearLayout>
 </LinearLayout>

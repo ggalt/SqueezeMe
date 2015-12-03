@@ -24,6 +24,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.georgegalt.squeezeme.AlbumListFragment.OnAlbumListFragInteractionListener;
@@ -56,8 +57,8 @@ public class AlbumListRecyclerViewAdapter extends RecyclerView.Adapter<AlbumList
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).artistName);
+        holder.mAlbumTitle.setText(mValues.get(position).albumName);
+        holder.mArtistName.setText(mValues.get(position).artistName);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,20 +89,22 @@ public class AlbumListRecyclerViewAdapter extends RecyclerView.Adapter<AlbumList
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+        public final TextView mAlbumTitle;
+        public final TextView mArtistName;
+        public final ImageView mImage;
         public AlbumItem mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mAlbumTitle = (TextView) view.findViewById(R.id.txtAlbumTitle);
+            mArtistName = (TextView) view.findViewById(R.id.txtArtistName);
+            mImage = (ImageView) view.findViewById(R.id.albumArtwork);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mAlbumTitle.getText() + "'";
         }
     }
 }

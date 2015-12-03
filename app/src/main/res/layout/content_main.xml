@@ -9,7 +9,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity"
     android:id="@+id/MainFrame"
-    android:background="@drawable/gradient_green">
+    android:background="@drawable/gradient_steel">
 
     <ExpandableListView
         android:layout_width="fill_parent"

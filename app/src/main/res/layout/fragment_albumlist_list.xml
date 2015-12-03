@@ -30,4 +30,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.georgegalt.squeezeme.AlbumListFragment"
-    tools:listitem="@layout/fragment_albumlist" />
+    tools:listitem="@layout/fragment_albumlist"
+    android:background="@drawable/gradient_steel" />
