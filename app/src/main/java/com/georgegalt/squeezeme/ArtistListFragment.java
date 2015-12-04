@@ -170,7 +170,7 @@ public class ArtistListFragment extends Fragment {
                 if(mListener==null) {
                     Log.d(TAG,"listener is null");
                 }
-                recyclerView.setAdapter(new ArtistRecyclerViewAdapter(ArtistContent.ITEMS, mListener));
+                recyclerView.setAdapter(new ArtistRecyclerViewAdapter(artistContent.ITEMS, mListener));
             }
         }
     }

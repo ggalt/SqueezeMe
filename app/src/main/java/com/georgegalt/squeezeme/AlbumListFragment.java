@@ -100,6 +100,10 @@ public class AlbumListFragment extends Fragment {
                     + " must implement OnAlbumListFragInteractionListener");
         }
         Log.d(TAG, "onCreateView");
+        if(view instanceof RecyclerView) {
+            Log.d(TAG,"it's a recyclerview!!");
+
+        }
         new AlbumGetTask().execute();
         Log.d(TAG,"onCreateView after ArtisGetTask");
 
@@ -179,7 +183,7 @@ public class AlbumListFragment extends Fragment {
                 if(mListener==null) {
                     Log.d(TAG,"listener is null");
                 }
-                recyclerView.setAdapter(new AlbumListRecyclerViewAdapter(AlbumContent.ITEMS, mListener));
+                recyclerView.setAdapter(new AlbumListRecyclerViewAdapter(albumContent.ITEMS, mListener));
             }
         }
     }
