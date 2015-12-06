@@ -23,30 +23,24 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@drawable/gradient_new_steel"
+    android:background="@drawable/list_background"
     android:dividerPadding="5dp"
-    android:clickable="false">
-
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:id="@+id/imageView"
-        android:src="@mipmap/ic_artist"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+    android:clickable="false"
+    android:baselineAligned="true">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ArtistName"
         android:id="@+id/txtAartistName"
-        android:textColor="@android:color/background_dark"
+        android:textColor="@android:color/primary_text_light"
         android:textSize="24dp"
-        android:textStyle="italic"
         android:layout_gravity="center_vertical"
         android:autoText="false"
         android:maxLines="1"
-        android:nestedScrollingEnabled="true" />
+        android:nestedScrollingEnabled="true"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp" />
 
 </LinearLayout>

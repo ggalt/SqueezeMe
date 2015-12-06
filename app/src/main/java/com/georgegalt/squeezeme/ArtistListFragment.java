@@ -109,7 +109,7 @@ public class ArtistListFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        super.onAttach(context);
+//        super.onAttach(context);
         Log.d(TAG,"***** onAttach ******");
 
         // This appears to never be called . . .  thanks Obama!
@@ -143,12 +143,12 @@ public class ArtistListFragment extends Fragment {
     }
 
 
-    private class ArtistGetTask extends AsyncTask<Void, Void, ArtistContent> {
+    private class ArtistGetTask extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected ArtistContent doInBackground(Void... params) {
+        protected Void doInBackground(Void... params) {
             try {
-                return GetArtists();
+                GetArtists();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -156,7 +156,7 @@ public class ArtistListFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(ArtistContent artistContent) {
+        protected void onPostExecute(Void aVoid) {
             // fill adapter with http asynctask request
             // Set the adapter
             if (view instanceof RecyclerView) {
@@ -164,21 +164,23 @@ public class ArtistListFragment extends Fragment {
                 RecyclerView recyclerView = (RecyclerView) view;
                 if (mColumnCount <= 1) {
                     recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                    recyclerView.addItemDecoration(new VerticalSpaceItemDecoration(Global.VERTICAL_ITEM_SPACE));
+
                 } else {
                     recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
                 }
                 if(mListener==null) {
                     Log.d(TAG,"listener is null");
                 }
-                recyclerView.setAdapter(new ArtistRecyclerViewAdapter(artistContent.ITEMS, mListener));
+                recyclerView.setAdapter(new ArtistRecyclerViewAdapter(ArtistContent.ITEMS, mListener));
             }
         }
     }
 
 
-    private ArtistContent GetArtists() throws IOException {
-        ArtistContent artistContent;
-        artistContent = new ArtistContent();
+    private void GetArtists() throws IOException {
+//        ArtistContent artistContent;
+//        artistContent = new ArtistContent();
         // create javascript request for SqueezeServer
         // format is  {"id":1,"method":"slim.request","params":["<player>",["cmd","param0","param1"]]}
         // or "{\"id\":1,\"method\":\"slim.request\",\"params\":[\"\",[\"artists\",\"0\",\"1000\"]]}"
@@ -209,8 +211,8 @@ public class ArtistListFragment extends Fragment {
             HttpURLConnection client = null;
             try {
                 // Establish http connection
-                url = new URL("http://"+MainActivity.serverInfo.getServerIP()+":"
-                        +MainActivity.serverInfo.getWebPort()+"/jsonrpc.js" );
+                url = new URL("http://"+ServerInfo.getServerIP()+":"
+                        +ServerInfo.getWebPort()+"/jsonrpc.js" );
                 Log.d(TAG,"Full URL request is: "+url.toString());
                 client = (HttpURLConnection) url.openConnection();
                 client.setDoOutput(true);
@@ -219,7 +221,7 @@ public class ArtistListFragment extends Fragment {
                 client.setRequestProperty("Content-Type", "application/x-www-form-url encoded");
                 client.setRequestMethod("POST");
                 client.connect();
-                Log.d(TAG, slimRequest.toString());
+                Log.d(TAG, slimRequest);
 
                 // Send the JSON object to the server
                 dataOutputStream = new DataOutputStream(client.getOutputStream());
@@ -247,9 +249,12 @@ public class ArtistListFragment extends Fragment {
                 JSONObject resultObj = jsonResponse.getJSONObject("result");
                 JSONArray artistLoopObject = resultObj.getJSONArray("artists_loop");
 
+                ArtistContent.ITEMS.clear();
+                ArtistContent.ITEM_MAP.clear();
+
                 for (int idx = 0; idx < artistLoopObject.length(); idx++) {
                     JSONObject artist = (JSONObject) artistLoopObject.get(idx);
-                    artistContent.addItem(new ArtistItem(artist.getString("id"), artist.getString("artist"), artist.getString("textkey")));
+                    ArtistContent.addItem(new ArtistItem(artist.getString("id"), artist.getString("artist"), artist.getString("textkey")));
                 }
 
             } catch (IOException e) {
@@ -263,8 +268,6 @@ public class ArtistListFragment extends Fragment {
             Log.e(TAG, "JSONObject creation error");
             e.printStackTrace();
         }
-
-        return artistContent;
     }
 
 }

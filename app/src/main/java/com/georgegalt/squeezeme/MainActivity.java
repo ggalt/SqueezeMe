@@ -107,8 +107,8 @@ public class MainActivity extends AppCompatActivity implements
 
             try {
                 // Establish http connection
-                url = new URL("http://"+serverInfo.getServerIP()+":"
-                        +serverInfo.getWebPort()+"/jsonrpc.js" );
+                url = new URL("http://"+ServerInfo.getServerIP()+":"
+                        +ServerInfo.getWebPort()+"/jsonrpc.js" );
                 client = (HttpURLConnection) url.openConnection();
                 client.setDoOutput(true);
                 client.setDoInput(true);
@@ -156,10 +156,10 @@ public class MainActivity extends AppCompatActivity implements
                         int iAlbumCount = resultObj.getInt("info total albums");
                         int iArtistCount = resultObj.getInt("info total artists");
                         int iGenreCount = resultObj.getInt("info total genres");
-                        serverInfo.setArtistCount(String.valueOf(iArtistCount));
-                        serverInfo.setAlbumCount(String.valueOf(iAlbumCount));
-                        serverInfo.setSongCount(String.valueOf(iSongCount));
-                        serverInfo.setGenreCount(String.valueOf(iGenreCount));
+                        ServerInfo.setArtistCount(String.valueOf(iArtistCount));
+                        ServerInfo.setAlbumCount(String.valueOf(iAlbumCount));
+                        ServerInfo.setSongCount(String.valueOf(iSongCount));
+                        ServerInfo.setGenreCount(String.valueOf(iGenreCount));
 
                     } catch (JSONException e) {
                         Log.e(TAG,"JSONException: "+e.getLocalizedMessage());
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements
                 Toast.makeText(getApplicationContext(),"Failed to communicate with the server.  Response code was: " + result,Toast.LENGTH_LONG).show();
             } else {
                 LoadHomePage();
-                Log.d(TAG, "Test to see if serverInfo is updated.  Artist count is: " + serverInfo.getArtistCount());
+                Log.d(TAG, "Test to see if serverInfo is updated.  Artist count is: " + ServerInfo.getArtistCount());
             }
         }
     }
@@ -323,14 +323,14 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             Log.d(TAG, "Click was short: " + item.artistName);
             Bundle bundle = new Bundle();
-            bundle.putString(SERVER_CMD,"[\"\",[\"albums\",\"0\",\"1000\",\"artist_id:"+item.id+"\",\"tags:l,j,S,s\"]");
+            bundle.putString(SERVER_CMD,"[\"\",[\"albums\",\"0\",\"1000\",\"artist_id:"+item.id+"\",\"tags:l,j,S,s\"]]");
             albumListFragment.setArguments(bundle);
 
-//            changeFragment(albumListFragment, true);
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.MainFrame,albumListFragment);
-            fragmentTransaction.addToBackStack("AlbumListFragment");
-            fragmentTransaction.commit();
+            changeFragment(albumListFragment, true);
+//            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+//            fragmentTransaction.replace(R.id.MainFrame,albumListFragment);
+//            fragmentTransaction.addToBackStack("AlbumListFragment");
+//            fragmentTransaction.commit();
         }
         return;
     }
@@ -348,16 +348,17 @@ public class MainActivity extends AppCompatActivity implements
             case 0:     // My Music
                 switch (child) {
                     case 0:     // Artist
-//                        changeFragment(artistListFragment,true);
-                        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                        fragmentTransaction.add(R.id.MainFrame, artistListFragment, "ArtistListFragment");
-                        fragmentTransaction.addToBackStack("ArtistListFragment");
-                        fragmentTransaction.commit();
+                        // NOTE: fall through since artist and composer seem to the be the same thing
+                    case 1:     // composer
+                        changeFragment(artistListFragment,true);
                         expandableListView.setVisibility(View.INVISIBLE);
                         break;
-                    case 1:
-                        break;
-                    case 2:
+                    case 2:     // Albums
+                        Bundle bundle = new Bundle();
+                        bundle.putString(SERVER_CMD,"[\"\",[\"albums\",\"0\",\""+ServerInfo.getAlbumCount() + "\",\"tags:l,j,S,s\"]]");
+                        albumListFragment.setArguments(bundle);
+                        changeFragment(albumListFragment, true);
+                        expandableListView.setVisibility(View.INVISIBLE);
                         break;
                     case 3:
                         break;
@@ -464,10 +465,11 @@ public class MainActivity extends AppCompatActivity implements
             macAddress = info.getMacAddress();
 
             if (macAddress == null) {
-                Toast.makeText(this, "Null", Toast.LENGTH_LONG).show();
-                serverInfo.setThisPlayerID(macAddress);
+                Toast.makeText(this, "Null " + isConnected +":"+info.toString(), Toast.LENGTH_LONG).show();
+                Log.d(TAG,info.toString());
             } else {
                 Toast.makeText(this, macAddress, Toast.LENGTH_LONG).show();
+                ServerInfo.setThisPlayerID(macAddress);
             }
         } catch (Exception e) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
@@ -494,6 +496,13 @@ public class MainActivity extends AppCompatActivity implements
 
             if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) { //fragment not in back stack, create it.
                 FragmentTransaction transaction = manager.beginTransaction();
+//                transaction.setCustomAnimations(R.animator.slide_in, R.animator.slide_out);
+                //Custom Animation
+                transaction.setCustomAnimations(R.animator.fragment_slide_left_enter,
+                        R.animator.fragment_slide_left_exit,
+                        R.animator.fragment_slide_right_enter,
+                        R.animator.fragment_slide_right_exit);
+
                 transaction.replace(R.id.MainFrame, frag, ((Object) frag).getClass().getName());
 
                 if (saveInBackStack) {

@@ -23,7 +23,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@drawable/blackbox_yellowboarder">
+    android:background="@drawable/list_background">
 
     <ImageView
         android:layout_width="40dp"
@@ -35,7 +35,8 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp">
+        android:layout_margin="5dp"
+        android:focusable="false">
 
         <TextView
             android:layout_width="fill_parent"
@@ -43,14 +44,16 @@
             android:text="New Text"
             android:id="@+id/txtAlbumTitle"
             android:textSize="20dp"
-            android:textColor="#ffffff" />
+            android:textColor="@android:color/primary_text_light"
+            android:maxLines="1"
+            android:nestedScrollingEnabled="true" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="New Text"
             android:id="@+id/txtArtistName"
-            android:textColor="#ffffff" />
+            android:textColor="@android:color/primary_text_light" />
 
     </LinearLayout>
 

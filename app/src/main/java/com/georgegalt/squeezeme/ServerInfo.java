@@ -106,18 +106,18 @@ public class ServerInfo {
         return thisPlayerID;
     }
 
-    public void setServerIP(String s) {SERVER_IP=s;}
-    public void setPlayerPort(String s) {PLAYER_PORT=s;}
-    public void setCliPort(String s) {CLI_PORT=s;}
-    public void setWebPort(String s) {WEB_PORT=s;}
-    public void setPlayerName(String s) {PLAYER_NAME=s;}
-    public void setUSERNAME(String s) {USERNAME=s;}
-    public void setPASSWORD(String s) {PASSWORD=s;}
+    public static void setServerIP(String s) {SERVER_IP=s;}
+    public static void setPlayerPort(String s) {PLAYER_PORT=s;}
+    public static void setCliPort(String s) {CLI_PORT=s;}
+    public static void setWebPort(String s) {WEB_PORT=s;}
+    public static void setPlayerName(String s) {PLAYER_NAME=s;}
+    public static void setUSERNAME(String s) {USERNAME=s;}
+    public static void setPASSWORD(String s) {PASSWORD=s;}
 
-    public void setAlbumCount(String s) {albumCount = s;}
-    public void setArtistCount(String s) {artistCount = s;}
-    public void setGenreCount(String s) {genreCount = s;}
-    public void setSongCount(String s) { songCount = s;}
+    public static void setAlbumCount(String s) {albumCount = s;}
+    public static void setArtistCount(String s) {artistCount = s;}
+    public static void setGenreCount(String s) {genreCount = s;}
+    public static void setSongCount(String s) { songCount = s;}
 
     public boolean isbCanUpdate() {return bCanUpdate;}
 

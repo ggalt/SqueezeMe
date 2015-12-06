@@ -124,7 +124,7 @@ public class AlbumListFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        super.onAttach(context);
+//        super.onAttach(context);
         if (context instanceof OnAlbumListFragInteractionListener) {
             mListener = (OnAlbumListFragInteractionListener) context;
         } else {
@@ -155,13 +155,13 @@ public class AlbumListFragment extends Fragment {
         void onAlbumListInteraction(AlbumContent.AlbumItem item, boolean isLongClick);
     }
 
-    private class AlbumGetTask extends AsyncTask<Void, Void, AlbumContent> {
+    private class AlbumGetTask extends AsyncTask<Void, Void, Void> {
 
 
         @Override
-        protected AlbumContent doInBackground(Void... params) {
+        protected Void doInBackground(Void... params) {
             try {
-                return GetAlbums();
+                GetAlbums();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -169,7 +169,7 @@ public class AlbumListFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(AlbumContent albumContent) {
+        protected void onPostExecute(Void aVoid) {
 //             fill adapter with http asynctask request
 //             Set the adapter
             if (view instanceof RecyclerView) {
@@ -177,28 +177,30 @@ public class AlbumListFragment extends Fragment {
                 RecyclerView recyclerView = (RecyclerView) view;
                 if (mColumnCount <= 1) {
                     recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//                    recyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
+                    recyclerView.addItemDecoration( new VerticalSpaceItemDecoration(Global.VERTICAL_ITEM_SPACE));
+                    Log.d(TAG,"Setting Veritcal Spacing");
                 } else {
                     recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
                 }
                 if(mListener==null) {
                     Log.d(TAG,"listener is null");
                 }
-                recyclerView.setAdapter(new AlbumListRecyclerViewAdapter(albumContent.ITEMS, mListener));
+                recyclerView.setAdapter(new AlbumListRecyclerViewAdapter(AlbumContent.ITEMS, mListener));
             }
         }
     }
 
-    private AlbumContent GetAlbums() throws IOException {
-        if(displayCmd!=null) {
-            Log.d(TAG, "Executing command: "+displayCmd);
-            return GetAlbums(displayCmd);
-        }
-        return GetAlbums("[\"\",[\"albums\",\"0\",\""+MainActivity.serverInfo.getAlbumCount()+"\",\"tags:l,j,S,s\"]]");
+    private void GetAlbums() throws IOException {
+        GetAlbums(displayCmd);
+        Log.d(TAG, "Executing command: " + displayCmd);
+//        if(displayCmd!= null) {
+//
+//        }
+//        GetAlbums("[\"\",[\"albums\",\"0\",\""+ServerInfo.getAlbumCount()+"\",\"tags:l,j,S,s\"]]");
     }
 
-    private AlbumContent GetAlbums(String albumCmd ) throws IOException {
-        AlbumContent albumContent;
-        albumContent = new AlbumContent();
+    private void GetAlbums(String albumCmd ) throws IOException {
         // create javascript request for SqueezeServer
         // format is  {"id":1,"method":"slim.request","params":["<player>",["cmd","param0","param1"]]}
         // or "{\"id\":1,\"method\":\"slim.request\",\"params\":[\"\",[\"artists\",\"0\",\"1000\"]]}"
@@ -208,7 +210,7 @@ public class AlbumListFragment extends Fragment {
         // the letter by which the artist is alphabetized).
         // we may have started with a request for a specific artist, which will have come
         // through as "displayCmd", so format a command if it is available.
-        String slimRequest = "{\"id\":1,\"method\":\"slim.request\",\"params\":"+albumCmd+"]}";
+        String slimRequest = "{\"id\":1,\"method\":\"slim.request\",\"params\":"+albumCmd+"}";
 
         Log.d(TAG, "cmd issued to server: "+slimRequest);
         JSONObject jsonSlimRequest = null;
@@ -224,8 +226,8 @@ public class AlbumListFragment extends Fragment {
             HttpURLConnection client = null;
             try {
                 // Establish http connection
-                url = new URL("http://"+MainActivity.serverInfo.getServerIP()+":"
-                        +MainActivity.serverInfo.getWebPort()+"/jsonrpc.js" );
+                url = new URL("http://"+ServerInfo.getServerIP()+":"
+                        +ServerInfo.getWebPort()+"/jsonrpc.js" );
                 client = (HttpURLConnection) url.openConnection();
                 client.setDoOutput(true);
                 client.setDoInput(true);
@@ -233,7 +235,7 @@ public class AlbumListFragment extends Fragment {
                 client.setRequestProperty("Content-Type", "application/x-www-form-url encoded");
                 client.setRequestMethod("POST");
                 client.connect();
-                Log.d(TAG, "Post Connect: " + slimRequest.toString());
+                Log.d(TAG, "Post Connect: " + slimRequest);
 
                 // Send the JSON object to the server
                 dataOutputStream = new DataOutputStream(client.getOutputStream());
@@ -262,14 +264,17 @@ public class AlbumListFragment extends Fragment {
                 JSONObject resultObj = jsonResponse.getJSONObject("result");
                 JSONArray albumLoopObject = resultObj.getJSONArray("albums_loop");
 
+                AlbumContent.ITEMS.clear();
+                AlbumContent.ITEM_MAP.clear();
+
                 for (int idx = 0; idx < albumLoopObject.length(); idx++) {
                     JSONObject album = (JSONObject) albumLoopObject.get(idx);
-                    albumContent.addItem(new AlbumContent.AlbumItem(
-                            album.getString("id"),
-                            album.getString("artist_id"),
-                            album.getString("album"),
-                            album.getString("artwork_track_id"),
-                            album.getString("textkey")));
+                    AlbumContent.addItem(new AlbumContent.AlbumItem(
+                            GetString(album, "id"),
+                            GetString(album, "artist_id"),
+                            GetString(album, "album"),
+                            GetString(album, "artwork_track_id"),
+                            GetString(album, "textkey")));
                 }
 
             } catch (IOException e) {
@@ -283,7 +288,18 @@ public class AlbumListFragment extends Fragment {
             Log.e(TAG, "JSONObject creation error");
             e.printStackTrace();
         }
+    }
 
-        return albumContent;
+    // convenience method to see if there is a value, and if not return an empty string
+    private String GetString(JSONObject album, String key) {
+        String retVal = "";
+        if(album.has(key)){
+            try {
+                retVal = album.getString(key);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return retVal;
     }
 }
