@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements
     private AlbumListFragment albumListFragment;
     private String macAddress;
 
+    private SlimProtocol slimProtocol;
+
     ExpandableListView expandableListView;
     HomePageExpandableListAdapter homePageExpandableListAdapter;
 
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements
         if(GetConnectedState() ) {
             Log.d(TAG, "Connected");
             GetServerBasics();
+            slimProtocol = new SlimProtocol();
         }
     }
 
@@ -538,6 +541,15 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
+
+    public SlimProtocol getSlimProtocol() {
+        return slimProtocol;
+    }
+
+    public void setSlimProtocol(SlimProtocol slimProtocol) {
+        this.slimProtocol = slimProtocol;
+    }
+
 }
 
 
