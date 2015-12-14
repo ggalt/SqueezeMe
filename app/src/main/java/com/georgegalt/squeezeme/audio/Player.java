@@ -36,7 +36,7 @@ import com.georgegalt.squeezeme.net.ProtocolListener;
  * 
  * @author richard
  */
-public class Player implements ProtocolListener, AudioBufferListener, ConfigListener {
+public class Player implements ProtocolListener, AudioBufferListener {
 	private static final String TAG = "Player-java";
 
 	public static final int DEFAULT_BUFFER_SIZE = 128000;
