@@ -36,7 +36,7 @@ import com.georgegalt.squeezeme.net.ProtocolListener;
  * 
  * @author richard
  */
-public class Player implements ProtocolListener, AudioBufferListener {
+public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, AudioBufferListener {
 	private static final String TAG = "Player-java";
 
 	public static final int DEFAULT_BUFFER_SIZE = 128000;
@@ -103,10 +103,12 @@ public class Player implements ProtocolListener, AudioBufferListener {
 
     private float rightLevel = 0;
 
+/*
     private Visualizer visualizer;
     
     private byte[] visualizerFrame = new byte[0];
-    
+*/
+
     private String lastMetaData = null;
 
     

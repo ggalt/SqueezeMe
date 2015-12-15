@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.georgegalt.squeezeme.ContentTypes.AlbumContent;
 import com.georgegalt.squeezeme.ContentTypes.ArtistContent;
+import com.georgegalt.squeezeme.net.SlimProtocol;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -542,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public SlimProtocol getSlimProtocol() {
+    public SlimProtocol getProtocol() {
         return slimProtocol;
     }
 

@@ -63,9 +63,11 @@
 //        }
 
 
-package com.georgegalt.squeezeme;
+package com.georgegalt.squeezeme.net;
 
 import android.util.Log;
+
+import com.georgegalt.squeezeme.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,7 +114,7 @@ public class SlimProtocol {
         udpSocket.start();
     }
 
-    public void addProtocolListener(String cmd, ProtocolListener listener) {
+    public void addProtocolListener(String cmd, com.georgegalt.squeezeme.ProtocolListener listener) {
         ArrayList l = (ArrayList)commandListeners.get(cmd);
         if (l == null) {
             l = new ArrayList();
@@ -122,7 +124,7 @@ public class SlimProtocol {
         connectionListeners.add(listener);
     }
 
-    public void removeProtocolListener(String cmd, ProtocolListener listener) {
+    public void removeProtocolListener(String cmd, com.georgegalt.squeezeme.ProtocolListener listener) {
         ArrayList l = (ArrayList)commandListeners.get(cmd);
         if (l == null)
             return;
@@ -422,7 +424,7 @@ public class SlimProtocol {
 
         Log.d(TAG, "command socket connected");
         for (Iterator i=connectionListeners.iterator(); i.hasNext(); ) {
-            ProtocolListener p = (ProtocolListener) i.next();
+            com.georgegalt.squeezeme.ProtocolListener p = (com.georgegalt.squeezeme.ProtocolListener) i.next();
             p.slimprotoConnected();
         }
     }
@@ -433,7 +435,7 @@ public class SlimProtocol {
 
         Log.d(TAG, "command socket disconnected");
         for (Iterator i=connectionListeners.iterator(); i.hasNext(); ) {
-            ProtocolListener p = (ProtocolListener) i.next();
+            com.georgegalt.squeezeme.ProtocolListener p = (com.georgegalt.squeezeme.ProtocolListener) i.next();
             p.slimprotoDisconnected();
         }
     }
@@ -461,7 +463,7 @@ public class SlimProtocol {
             return;
 
         for (Iterator j=l.iterator(); j.hasNext(); ) {
-            ProtocolListener p = (ProtocolListener) j.next();
+            com.georgegalt.squeezeme.ProtocolListener p = (com.georgegalt.squeezeme.ProtocolListener) j.next();
             p.slimprotoCmd(cmd, buf, offset, len);
         }
     }
