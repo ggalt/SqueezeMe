@@ -9,7 +9,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity"
     android:id="@+id/MainFrame"
-    android:background="@drawable/concrete">
+    android:background="@drawable/f23_long">
 
     <ExpandableListView
         android:layout_width="fill_parent"
