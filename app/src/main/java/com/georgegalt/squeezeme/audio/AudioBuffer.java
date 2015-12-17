@@ -21,6 +21,8 @@
 
 package com.georgegalt.squeezeme.audio;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,9 +33,8 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.sound.sampled.AudioFormat;
+//import javax.sound.sampled.AudioFormat;
 
-import org.apache.log4j.Logger;
 
 
 /**
@@ -42,18 +43,18 @@ import org.apache.log4j.Logger;
  * @author Richard Titmuss
  */
 public class AudioBuffer extends InputStream {
-	private static final Logger logger = Logger.getLogger("audiobuffer.verbose");
+	private static final String TAG = "AudioBuffer-Java";
 	
-	public static AudioFormat DEFAULT_AUDIO_FORMAT = new AudioFormat(
-            AudioFormat.Encoding.PCM_SIGNED, 
-            44100, /* sample rate */
-            16, /* sample size in bits, */
-            2, /* channels */
-            4, /* frame size in bytes */
-            44100, /* frame rate */
-            false /* big endian */
-          	);
-
+//	public static AudioFormat DEFAULT_AUDIO_FORMAT = new AudioFormat(
+//            AudioFormat.Encoding.PCM_SIGNED, 
+//            44100, /* sample rate */
+//            16, /* sample size in bits, */
+//            2, /* channels */
+//            4, /* frame size in bytes */
+//            44100, /* frame rate */
+//            false /* big endian */
+//          	);
+//
 	private long bufferSize = 262144;
 	
 	private long readPtr = 0;
@@ -72,7 +73,7 @@ public class AudioBuffer extends InputStream {
 	
 	private HashSet listeners = new HashSet();
 	
-	private AudioFormat audioFormat;
+//	private AudioFormat audioFormat;
 	
 	private SortedMap writeEvents = new TreeMap();
 	
@@ -86,20 +87,20 @@ public class AudioBuffer extends InputStream {
 	public AudioBuffer(int bufferSize) {
 		this.bufferSize = bufferSize;
 		buf = new byte[bufferSize];
-		audioFormat = DEFAULT_AUDIO_FORMAT;
+//		audioFormat = DEFAULT_AUDIO_FORMAT;
 	}
 	
-	public synchronized AudioFormat getAudioFormat() {
-	    return this.audioFormat;
-	}
-	
-	public synchronized void setAudioFormat(AudioFormat audioFormat) {
-	    if (this.audioFormat.matches(audioFormat))
-	        return;
-	    
-	    this.audioFormat = audioFormat;
-	    addReadEvent(0, new AudioEvent(this, AudioEvent.BUFFER_SET_AUDIO_FORMAT));
-	}
+//	public synchronized AudioFormat getAudioFormat() {
+//	    return this.audioFormat;
+//	}
+//	
+//	public synchronized void setAudioFormat(AudioFormat audioFormat) {
+//	    if (this.audioFormat.matches(audioFormat))
+//	        return;
+//	    
+//	    this.audioFormat = audioFormat;
+//	    addReadEvent(0, new AudioEvent(this, AudioEvent.BUFFER_SET_AUDIO_FORMAT));
+//	}
 	
 	public synchronized void setOutputStream(OutputStream copy) {
 	    this.copy = copy;
@@ -157,7 +158,7 @@ public class AudioBuffer extends InputStream {
 	
 	/**
 	 * Set the buffer to loop once the buffer is closed.
-	 * @param loop
+	 * @param repeat
 	 */
 	public synchronized void setRepeat(boolean repeat) {
 	    loopPtr = writePtr;
@@ -206,15 +207,14 @@ public class AudioBuffer extends InputStream {
 	public synchronized int available() throws IOException {
 		int avail = (int)(writePtr - readPtr);
 		
-		if (logger.isDebugEnabled())
-			logger.debug("avil R=" + readPtr + " W=" + writePtr + " A="	+ avail);    
+		Log.d(TAG, "avil R=" + readPtr + " W=" + writePtr + " A=" + avail);
 		return avail;
 	}
 	
 	public synchronized int freeSpace() {
 		int free = (int)(bufferSize - writePtr + readPtr);
 
-		logger.debug("free R=" + readPtr + " W=" + writePtr + " F=" + free);
+		Log.d(TAG, "free R=" + readPtr + " W=" + writePtr + " F=" + free);
 		return free;
 	}
 	
@@ -241,7 +241,7 @@ public class AudioBuffer extends InputStream {
 				if (closed)
 					return -1;
 
-				logger.debug("buf W=" + writePtr + " R=" + readPtr
+				Log.d(TAG, "buf W=" + writePtr + " R=" + readPtr
 						+ " Buffer full, waiting ...");
 
 				for (Iterator i = listeners.iterator(); i.hasNext();)
@@ -275,9 +275,8 @@ public class AudioBuffer extends InputStream {
 		    copy.write(buf, ptr, n);
 		
 		synchronized (this) {
-			if (logger.isDebugEnabled())
-				logger.debug("buf W=" + writePtr + " R=" + readPtr + " F=" + free+ " #=" + n);
-		
+			Log.d(TAG, "buf W=" + writePtr + " R=" + readPtr + " F=" + free + " #=" + n);
+
 			// Check for eos
 			if (n == -1)
 			    close();
@@ -311,10 +310,10 @@ public class AudioBuffer extends InputStream {
 		while (freeSpace() < (len-off)) {
 	        if (closed)
 	            return -1;
-	        
-	        if (logger.isDebugEnabled())
-	        		logger.debug("buf R=" + readPtr + " W=" + writePtr
-	        				+ " Buffer full, waiting ...");
+
+			Log.d(TAG, "buf R=" + readPtr + " W=" + writePtr
+					+ " Buffer full, waiting ...");
+
 
 			for (Iterator i = listeners.iterator(); i.hasNext();)
 				((AudioBufferListener) i.next()).bufferEvent(new AudioEvent(this, AudioEvent.BUFFER_FULL));
@@ -393,7 +392,7 @@ public class AudioBuffer extends InputStream {
 		    }
 		    
 			if (!underrun && readPtr == writePtr) {
-				logger.debug("audio buffer underrun");
+				Log.d(TAG, "audio buffer underrun");
 				underrun = true;
 				for (Iterator i = listeners.iterator(); i.hasNext();)
 					((AudioBufferListener) i.next()).bufferEvent(new AudioEvent(this, AudioEvent.BUFFER_UNDERRUN));
@@ -401,11 +400,10 @@ public class AudioBuffer extends InputStream {
 
 			if (closed)
 				return -1;
-			
-			if (logger.isDebugEnabled())
-				logger.debug("buf R=" + readPtr + " W=" + writePtr
-						+ " Buffer empty, waiting ...");
-			
+
+			Log.d(TAG, "buf R=" + readPtr + " W=" + writePtr
+					+ " Buffer empty, waiting ...");
+
 			try {
 		        wait();
 			} catch (InterruptedException e) {
@@ -435,8 +433,7 @@ public class AudioBuffer extends InputStream {
 	    readPtr += n;		
 		notifyAll();
 
-		if (logger.isDebugEnabled())
-			logger.debug("buf R=" + readPtr + " W=" + writePtr + " #=" + n);
+		Log.d(TAG, "buf R=" + readPtr + " W=" + writePtr + " #=" + n);
 
 		// Notify listeners when an event mark is passed
 		while (!readEvents.isEmpty()) {
@@ -489,11 +486,11 @@ public class AudioBuffer extends InputStream {
 	}
 	
 	public void mark(int readlimit) {
-		logger.error("mark called "+readlimit);
+		Log.e(TAG, "mark called "+readlimit);
 	}
 	
 	public void reset() throws IOException {
-		logger.error("reset called");
+		Log.e(TAG, "reset called");
 	}
 }
 

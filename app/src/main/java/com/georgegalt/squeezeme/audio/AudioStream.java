@@ -21,10 +21,10 @@
 
 package com.georgegalt.squeezeme.audio;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.log4j.Logger;
 
 /**
  * Fill AudioBuffer from an InputStream. 
@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * @author Richard Titmuss
  */
 public class AudioStream implements Runnable {
-	private static final Logger logger = Logger.getLogger("javasound");
+	private static final String TAG = "AudioStream.Java";
 
 	private static final int DEFAULT_BUFFER_SIZE = 128000;
 
@@ -85,7 +85,7 @@ public class AudioStream implements Runnable {
     }
     
     public void run() {
-        logger.debug("audio stream started"); 
+        Log.d(TAG, "audio stream started");
 		
         try {            
             int n = 0;
@@ -109,7 +109,7 @@ public class AudioStream implements Runnable {
                         n += audioStream.read(buf, 0, blockSize - n);
                     
                     String metadata = new String(buf, 0, blockSize);
-                    logger.debug("ICY METADATA:" + metadata);
+                    Log.d(TAG, "ICY METADATA:" + metadata);
                     audioBuffer.addReadEvent(0, new AudioEvent(audioBuffer,
                             AudioEvent.BUFFER_METADATA, metadata));                    
                     continue;
@@ -129,12 +129,12 @@ public class AudioStream implements Runnable {
 
         } catch (Exception e) {
             // usually socket closed
-            logger.debug("Exception in AudioStream", e);
+            Log.d(TAG, "Exception in AudioStream", e);
         }
         try {
             playing = false;
             audioBuffer.close();
-            logger.debug("audio stream closed");
+            Log.d(TAG, "audio stream closed");
         } catch (IOException e1) {
         }        
     }

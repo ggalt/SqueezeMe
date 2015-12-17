@@ -36,8 +36,8 @@ import com.georgegalt.squeezeme.net.ProtocolListener;
  * 
  * @author richard
  */
-public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, AudioBufferListener {
-	private static final String TAG = "Player-java";
+public class Player implements ProtocolListener, AudioBufferListener {
+	private static final String TAG = "Player.Java";
 
 	public static final int DEFAULT_BUFFER_SIZE = 128000;
 
@@ -47,9 +47,9 @@ public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, Au
 
 	private PushbackInputStream audioInputStream;
 
-	private AudioMixer audioMixer;
+//	private AudioMixer audioMixer;
 
-	private AudioDecoder audioDecoder;
+//	private AudioDecoder audioDecoder;
 
 	private AudioStream audioStream;
 	
@@ -142,7 +142,7 @@ public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, Au
 		squeeze.getProtocol().addProtocolListener("stat", this);
 		squeeze.getProtocol().addProtocolListener("visg", this);
 		 
-		Config.addConfigListener(this);
+//		Config.addConfigListener(this);
 
 		outputBuffer = new AudioBuffer(OUTPUT_BUFFER_SIZE);
         outputBuffer.addListener(this);
@@ -172,22 +172,19 @@ public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, Au
     }
     
     public void initMixer() {
-        try {
-            if (audioMixer != null)
-                audioMixer.stop();
-            
-            audioMixer = new AudioMixer(outputBuffer);
-            audioMixer.setVolume(leftLevel, rightLevel);
-		    audioMixer.setVisualizer(visualizer);
-            
-            if (state == PLAYING)
-                audioMixer.play(0);
-        }
-        catch (AudioException e) {
-            Log.e(TAG, "Changing mixer" + e.getLocalizedMessage());
-        } catch (LineUnavailableException e) {
-		    ConfigPopup.showErrorDialog("Sorry SoftSqueeze could not find a sound card on your computer.", "No Sound Card Detected");
-        }
+//        try {
+////            if (audioMixer != null)
+////                audioMixer.stop();
+//
+////            audioMixer = new AudioMixer(outputBuffer);
+////            audioMixer.setVolume(leftLevel, rightLevel);
+////		    audioMixer.setVisualizer(visualizer);
+//
+////            if (state == PLAYING)
+////                audioMixer.play(0);
+//        }
+//        catch (AudioException e) {
+//            Log.e(TAG, "Changing mixer" + e.getLocalizedMessage());
     }
     
 
@@ -271,36 +268,36 @@ public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, Au
 		    int frameLen = len - off;
 
 		    // Ignore visu frame if this is a repeat of the last frame
-		    if (frameLen == visualizerFrame.length) {
-		        int i = 0;
-		        while (i < visualizerFrame.length) {
-		            if (buf[off+i] != visualizerFrame[i++])
-		                break;
-		        }
-		        if (frameLen == i)
-		            return;
-		    }
-
-		    visualizerFrame = new byte[frameLen];
-		    System.arraycopy(buf, off, visualizerFrame, 0, frameLen);
-		    
-		    // Change visualizer
-		    int visType = buf[off];
-		    switch (visType) {
-		    case 1:
-		        visualizer = new VisualizerVUMeter(squeeze, buf, off, len);
-		        break;
-		    case 2:
-		        visualizer = new VisualizerSpectrumAnalyser(squeeze, buf, off, len);
-		        break;
-		    default:
-		        visualizer = null;
-		    }
-
-		    audioMixer.setVisualizer(visualizer);
+//		    if (frameLen == visualizerFrame.length) {
+//		        int i = 0;
+//		        while (i < visualizerFrame.length) {
+//		            if (buf[off+i] != visualizerFrame[i++])
+//		                break;
+//		        }
+//		        if (frameLen == i)
+//		            return;
+//		    }
+//
+//		    visualizerFrame = new byte[frameLen];
+//		    System.arraycopy(buf, off, visualizerFrame, 0, frameLen);
+//
+//		    // Change visualizer
+//		    int visType = buf[off];
+//		    switch (visType) {
+//		    case 1:
+//		        visualizer = new VisualizerVUMeter(squeeze, buf, off, len);
+//		        break;
+//		    case 2:
+//		        visualizer = new VisualizerSpectrumAnalyser(squeeze, buf, off, len);
+//		        break;
+//		    default:
+//		        visualizer = null;
+//		    }
+//
+//		    audioMixer.setVisualizer(visualizer);
 		}
 		else if (cmd.equals("visg")) {
-			VisualizerVUMeter.uploadGraphic(buf, off, len);
+//			VisualizerVUMeter.uploadGraphic(buf, off, len);
 		}
 	}
 
@@ -468,15 +465,15 @@ public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, Au
 	    synchronized (lock) {	        
 	        Log.d(TAG, "initStream: state " + state);
 	        
-	        AudioFormat audioFormat;
+//	        AudioFormat audioFormat;
 			if (format == 'm') { // mp3
-				audioFormat = new AudioFormat(AudioDecoder.MPEG1L3, 44100f,
-						AudioSystem.NOT_SPECIFIED, 2, AudioSystem.NOT_SPECIFIED,
-						AudioSystem.NOT_SPECIFIED, false);
+//				audioFormat = new AudioFormat(AudioDecoder.MPEG1L3, 44100f,
+//						AudioSystem.NOT_SPECIFIED, 2, AudioSystem.NOT_SPECIFIED,
+//						AudioSystem.NOT_SPECIFIED, false);
 			} else if (format == 'f') { // flac
-				audioFormat = new AudioFormat(AudioDecoder.FLAC, 44100f,
-						AudioSystem.NOT_SPECIFIED, 2, AudioSystem.NOT_SPECIFIED,
-						AudioSystem.NOT_SPECIFIED, false);
+//				audioFormat = new AudioFormat(AudioDecoder.FLAC, 44100f,
+//						AudioSystem.NOT_SPECIFIED, 2, AudioSystem.NOT_SPECIFIED,
+//						AudioSystem.NOT_SPECIFIED, false);
 			} else if (format == 'p') { // pcm
 				float pcmSampleRates[] = {
 					11025f, 22050f, 32000f, 44100f, 48000f, 
@@ -489,25 +486,25 @@ public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, Au
 				float sampleRate = pcmSampleRates[pcmSampleRate];
 				int sizeInBits = pcmSampleWidths[pcmSampleSize];
 				
-				audioFormat = new AudioFormat(
-							AudioFormat.Encoding.PCM_SIGNED,
-							sampleRate,
-							16,
-							pcmChannels, 
-							pcmChannels * (sizeInBits / 8),
-							sampleRate,
-							pcmEndian);				
+//				audioFormat = new AudioFormat(
+//							AudioFormat.Encoding.PCM_SIGNED,
+//							sampleRate,
+//							16,
+//							pcmChannels,
+//							pcmChannels * (sizeInBits / 8),
+//							sampleRate,
+//							pcmEndian);
 			} else if (format == 'o') { // ogg
 				/* one step less to non-hardcoded format */
-				audioFormat = new AudioFormat(AudioDecoder.OGG,	44100f,
-						AudioSystem.NOT_SPECIFIED, 2, AudioSystem.NOT_SPECIFIED,
-						AudioSystem.NOT_SPECIFIED, false);
+//				audioFormat = new AudioFormat(AudioDecoder.OGG,	44100f,
+//						AudioSystem.NOT_SPECIFIED, 2, AudioSystem.NOT_SPECIFIED,
+//						AudioSystem.NOT_SPECIFIED, false);
 			} else {
 				throw new AudioException("Unknown audio format requested: " + format);
 			}
 
 	        decoderBuffer = new AudioBuffer(DECODER_BUFFER_SIZE);	        
-	        decoderBuffer.setAudioFormat(audioFormat);
+//	        decoderBuffer.setAudioFormat(audioFormat);
 	        decoderBuffer.addListener(this);
 	        
 	        /*
@@ -525,10 +522,10 @@ public class Player implements com.georgegalt.squeezeme.net.ProtocolListener, Au
 	            decoderBuffer.setRepeat(true);
 	        
 	        audioStream = new AudioStream(audioInputStream, decoderBuffer, metaint);
-	        audioDecoder = new AudioDecoder(decoderBuffer, outputBuffer, replayGain);
+//	        audioDecoder = new AudioDecoder(decoderBuffer, outputBuffer, replayGain);
 	        
 	        state = BUFFERING;
-	        audioDecoder.play();
+//	        audioDecoder.play();
 
 	        lock.notifyAll();
 	    }

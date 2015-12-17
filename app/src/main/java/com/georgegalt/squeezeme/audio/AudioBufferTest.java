@@ -213,9 +213,9 @@ public class AudioBufferTest extends TestCase {
     }
     
         
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(AudioBufferTest.class);
-    }
+//    public static void main(String[] args) {
+//        junit.textui.TestRunner.run(AudioBufferTest.class);
+//    }
 
     /*
      * @see TestCase#setUp()
